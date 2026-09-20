@@ -1,0 +1,122 @@
+# PayTaxi Project Status
+
+## Architecture
+The single Next.js app is now a 3-part monorepo:
+- `/frontend` — Next.js 16 App Router UI only. No DB access. Calls `/backend` over HTTP. Uses httpOnly cookie for auth.
+- `/backend` — Express + Prisma API server on port 5000.
+- `/mobile` — React Native Expo app (`et.paytaxi.app`). Calls `/backend` via LAN IP. Uses expo-secure-store for JWT.
+- `/packages/shared` — Shared types and browser API client (cookie-based, no localStorage).
+
+## Now real (was static/mock before)
+| Feature | Route/File |
+|---|---|
+| OTP challenge create & verify | `POST /auth/request-otp`, `POST /auth/verify-otp` via `backend/src/routes/auth.ts` |
+| JWT access token issuance | `backend/src/services/auth.service.ts#verifyOtp` |
+| **JWT as httpOnly cookie (web)** | `backend/src/routes/auth.ts` — sets `httpOnly`, `secure`, `sameSite:'strict'` cookie on login |
+| **Session restore via /auth/me** | `GET /auth/me` — reads httpOnly cookie, returns current user. Frontend calls this on mount instead of localStorage |
+| **POST /auth/logout** | Clears the httpOnly cookie server-side |
+| Driver registration (PENDING) | `POST /drivers/register` via `backend/src/routes/drivers.ts` |
+| Admin driver approval + QR issuance | `POST /drivers/:id/approve` via `backend/src/routes/drivers.ts` |
+| QR replace-on-lost | `POST /qr/replace` via `backend/src/routes/qr.ts` |
+| **QR PNG generation** | `GET /qr/:taxiId.png` — real scannable PNG via `qrcode` npm package. Encodes `https://paytaxi.et/t/{taxiId}` |
+| Fare server validation | `backend/src/services/fares.ts` — client only sends preset ID |
+| Payment initiation | `POST /payments/initiate` via `backend/src/routes/payments.ts` |
+| Transaction state machine | `backend/src/services/fares.ts#canTransition` |
+| **Webhook compare-and-set (fixed)** | `POST /webhooks/addispay` — zero-affected-rows re-reads status: idempotent if matches, logs warning if conflicts |
+| **DB CHECK constraints** | Migration `20260808085150_add_check_constraints` — enforces valid string values for `status`, `role`, `verificationStatus` at DB level |
+| Driver dashboard aggregation | `GET /dashboard` via `backend/src/routes/dashboard.ts` |
+| In-memory rate limiting | OTP: 10/15min · Payments: 20/15min via `express-rate-limit` |
+| Structured transaction logging | `console.log(JSON.stringify({event, timestamp, transactionId, ...}))` in payments + webhooks routes |
+| **Mobile QR scanner** | `mobile/App.tsx` — expo-camera `CameraView` in a Modal; parses `https://paytaxi.et/t/{taxiId}` |
+| **Mobile i18n** | `mobile/lib/i18n.ts` — react-i18next with English + Amharic for all screens |
+| **Frontend i18n** | `frontend/i18n/request.ts`, `frontend/messages/{en,am}.json`, and `paytaxi-app.tsx` — uses next-intl `useTranslations()`. Features a fully working language toggle in the header that sets `NEXT_LOCALE` and reloads. |
+
+## canTransition() call sites (all transaction status writes)
+| Write path | File | canTransition called? |
+|---|---|---|
+| Payment initiation | `backend/src/routes/payments.ts` | ✅ N/A — starts as `PENDING` (no prior state) |
+| Webhook status update | `backend/src/routes/webhooks.ts` | ✅ Yes — called before every `updateMany` |
+
+> **Confirmed:** Every write that changes `transaction.status` after creation goes through `canTransition()`. Initiation bypasses it correctly (PENDING is always a valid start state with no prior state to transition from).
+
+## Still simulated
+| Feature | File | What to replace |
+|---|---|---|
+| AddisPay checkout URL | `backend/src/services/provider.ts` → `AddisPaySandboxProvider.initiatePayment()` | Real AddisPay API call with ADDISPAY_API_KEY |
+| AddisPay webhook trigger | `POST /webhooks/addispay` with header `x-addispay-signature: sandbox-signature` | Real HMAC signature verification |
+| OTP SMS delivery | `backend/src/services/auth.service.ts#requestOtp` (console.log) | SMS gateway (Twilio, Afro Messages, etc.) |
+
+## Mobile app status
+| Flow | Status |
+|---|---|
+| Auth (OTP request + verify) | ✅ Implemented |
+| Passenger payment flow | ✅ Implemented — with QR scanner via expo-camera |
+| Driver dashboard | ✅ Implemented |
+| Driver QR replace | ✅ Implemented |
+| expo-camera QR scan | ✅ Wired to `CameraView` in PayScreen — parses `https://paytaxi.et/t/{taxiId}` |
+| Localization (react-i18next) | ✅ Implemented — English + Amharic, language switcher on Home screen |
+| Universal Links (iOS/Android) | 🔲 Scaffolded in `app.json` (fill `assetlinks.json` when signing cert is ready) |
+
+## Database
+- **Provider**: SQL Server (local — `DESKTOP-SI08CAC\paytaxi`)
+- **Config**: Zero-arg PrismaClient with schema URL
+- **Migration status**: ✅ 2 migrations applied:
+  - `20260808074951_init` — full schema
+  - `20260808085150_add_check_constraints` — enum-equivalent CHECK constraints
+- **Seed**: ✅ Complete with admin (`+251911111111`), driver (`+251922222222`, `TX-1001`), and passenger (`+251933333333`)
+- **To switch to Supabase/PostgreSQL**: change `provider = "postgresql"` in `schema.prisma`, delete `prisma.config.ts`, update `DATABASE_URL`
+
+## Security & Deployment notes
+- **Cookie auth (web)**: `sameSite: 'strict'` + `httpOnly` + `secure` (in production).
+  - ⚠️ **`sameSite: 'strict'` requires frontend and backend to share the same registrable domain** (e.g., both on `paytaxi.et`). It will **silently fail** if deployed on unrelated domains (e.g., frontend on Vercel, backend on Heroku with different TLDs). Whoever sets up production hosting must ensure this constraint is met or switch to `sameSite: 'lax'` with appropriate CORS hardening.
+- **Mobile**: Uses `expo-secure-store` for JWT. Token is sent as `Authorization: Bearer` header. Not affected by cookie constraints.
+- **DB constraints**: SQL Server `CHECK` constraints on `status`, `role`, `verificationStatus` prevent invalid string values even from direct SQL queries or bugs.
+- **QR codes**: Generated server-side as real PNG using `qrcode` npm package. Payload is `https://paytaxi.et/t/{taxiId}` — compatible with iOS Universal Links and Android App Links. Falls back to browser when app is not installed. (Custom schemes like `paytaxi://` would break the no-install fallback.)
+
+- **Automated Tests**:
+  - `backend/src/__tests__/fares.test.ts` — covers all valid/invalid `canTransition()` state machine transitions (16 cases)
+  - `backend/src/__tests__/webhooks.test.ts` — covers idempotency, compare-and-set race conditions, and terminal state protection
+  - `backend/src/__tests__/auth.service.test.ts` — covers OTP generation, hashing, attempt limits, expiration, and role validation
+  - `backend/src/__tests__/drivers.service.test.ts` — covers registration, approval, and QR replacement flows
+  - **Result**: 42 tests, 4 suites, all passing ✅
+
+## Resolved known limitations (from previous status)
+| Previously flagged | Resolution |
+|---|---|
+| "Webhook race — zero affected rows assumed success" | ✅ Fixed: re-reads current status, distinguishes idempotent vs conflict, logs structured warning on conflict |
+| "QR image — returns payload URL string, not an image" | ✅ Fixed: `GET /qr/:taxiId.png` returns a real scannable 512×512 PNG |
+| "JWT in localStorage" | ✅ Fixed: httpOnly cookie for web, expo-secure-store for mobile |
+| "Dead /frontend/app/api/** routes" | ✅ Deleted |
+| "i18n not implemented" | ✅ Implemented: next-intl (frontend, wired into components), react-i18next (mobile) with en + am |
+| "Camera permission fallback" | ✅ Confirmed: `mobile/App.tsx` handles denied permissions gracefully by showing a message and 'Cancel' button to fallback to manual text input. |
+| "CORS config" | ✅ Confirmed: `backend/src/index.ts` explicitly checks `allowedOrigins` (including `http://localhost:3000` and expo LAN IPs) and uses `credentials: true`. |
+
+## Known remaining gaps
+- `app_session` table kept for schema compatibility but superseded by JWT — safe to drop in a future migration.
+- Payout reconciliation, admin console, real AddisPay, NFC — deferred by design.
+- `pnpm.overrides` warning in frontend — move the override block to root `package.json` to silence.
+
+## How to run locally
+
+```bash
+# Backend (port 5000)
+cd backend
+# Ensure backend/.env has DATABASE_URL set
+pnpm prisma:migrate   # first time: creates tables
+pnpm prisma:seed      # loads test data
+pnpm dev
+
+# Run tests
+cd backend
+npx jest --config jest.config.json
+
+# Frontend (port 3000)
+cd frontend
+# Ensure frontend/.env.local has NEXT_PUBLIC_API_URL=http://localhost:5000
+pnpm dev
+
+# Mobile
+cd mobile
+# Ensure mobile/.env has EXPO_PUBLIC_API_URL=http://<YOUR_LAN_IP>:5000
+npx expo start
+```

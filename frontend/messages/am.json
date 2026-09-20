@@ -1,0 +1,61 @@
+{
+  "auth": {
+    "title_passenger": "የተሳፋሪ መዳረሻ",
+    "title_driver": "የሹፌር መዳረሻ",
+    "subtitle": "በስልክ ቁጥርዎ ይግቡ። OTP ኮዱ ወደ ሰርቨር ኮንሶል ይላካል (dev mode)።",
+    "phone_label": "ስልክ ቁጥር",
+    "phone_placeholder": "+251911234567",
+    "send_otp": "OTP ላክ",
+    "sending": "እየተላከ…",
+    "otp_label": "6-ሃሳቤ ኮድ",
+    "verify": "አረጋግጥ እና ቀጥል",
+    "verifying": "እያረጋገጠ…",
+    "dev_otp": "Dev OTP:"
+  },
+  "registration": {
+    "label": "የሹፌር ምዝገባ",
+    "title": "ፔይታክሲን ይቀላቀሉ",
+    "subtitle": "መገለጫዎ PENDING ሆኖ ይፈጠራል። አስተዳዳሪ ካጸደቀ በኋላ QR ይሰጣታል።",
+    "submit": "ምዝገባ አስገባ",
+    "submitting": "እየላከ…",
+    "mock_id": "ቅጂ መታወቂያ ስፋ",
+    "mock_license": "ቅጂ ፍቃድ ስፋ"
+  },
+  "payment": {
+    "title": "ተሽከርካሪ ክፍያ ፈፀም",
+    "subtitle": "ሰርቨሩ ታክሲ፣ ሹፌር ማፅደቅ፣ ቅርብ QR እና ዋጋ ያረጋግጣሉ። ደንበኛ የሚልካቸው መጠኖች ይተዋሉ።",
+    "taxi_id_label": "የታክሲ መለያ",
+    "continue_btn": "ወደ AddisPay ቀጥል",
+    "pending_btn": "ክፍያ እየፈጠረ…",
+    "signed_in_as": "ወጥቷል"
+  },
+  "dashboard": {
+    "label": "የሹፌር ፖርታል",
+    "welcome": "እንኳን ደህና መጡ፣ {name}",
+    "subtitle": "ከሰርቨሩ የሚጫነው የርሶ ሹፌር መገለጫ እና ግብይቶች ብቻ ናቸው።",
+    "earnings": "ተሳካ ደሞዝ",
+    "payments": "ተሳካ ክፍያዎች",
+    "no_qr": "QR እስካሁን የለም",
+    "download_qr": "QR PNG አውርድ",
+    "report_lost": "ጠፋ/ተሰረቀ QR ሪፖርት",
+    "replacing": "እየተካ…",
+    "refresh": "ዳሽቦርድ አድስ",
+    "recent_tx": "የቅርብ ጊዜ ግብይቶች",
+    "no_tx": "እስካሁን ምንም ግብይቶች የሉም።",
+    "sign_out": "ውጣ",
+    "log_out": "ወጣ"
+  },
+  "home": {
+    "tagline": "የተረጋገጡ ጉዞዎች። ሰርቨር-ያረጋገጡ ክፍያዎች።",
+    "heading": "ያለ ሰቆቃ ታክሲ ክፍያዎን ይፈፅሙ።",
+    "description": "ፔይታክሲ እያንዳንዱ ክፍያ ከተፈቀደ ሹፌር እና ቅርብ QR ጋር ያስተሳስረዋል። ሹፌሮች ለደሞዛቸው ብቻ ዳሽቦርድ አላቸው።",
+    "pay_btn": "ታክሲ ክፈል",
+    "driver_btn": "የሹፌር ምዝገባ",
+    "passenger_login": "የተሳፋሪ ግቤት",
+    "driver_portal": "የሹፌር ፖርታል"
+  },
+  "nav": {
+    "brand_name": "PAYTAXI",
+    "brand_tagline": "ደህንነቱ የተጠበቀ ታክሲ ክፍያ"
+  }
+}

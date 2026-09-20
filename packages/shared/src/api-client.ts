@@ -1,0 +1,71 @@
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+
+// Mobile-only: in-memory token for Bearer header (mobile uses expo-secure-store externally)
+let _mobileToken: string | null = null
+
+export function setMobileToken(token: string | null) {
+  _mobileToken = token
+}
+
+export function getMobileToken(): string | null {
+  return _mobileToken
+}
+
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string> || {}),
+  }
+  // For web: the httpOnly cookie is sent automatically via credentials:'include'
+  // For mobile (SSR/non-browser): include Bearer token if set
+  if (_mobileToken) headers['Authorization'] = `Bearer ${_mobileToken}`
+
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers,
+    // Send cookies on cross-origin requests (required for httpOnly cookie auth on web)
+    credentials: 'include',
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Request failed')
+  return data as T
+}
+
+export const api = {
+  auth: {
+    requestOtp: (phone: string, role: string) =>
+      request<{ challengeId: string; code: string; expiresInSeconds: number }>(
+        '/auth/request-otp', { method: 'POST', body: JSON.stringify({ phone, role }) }
+      ),
+    verifyOtp: (challengeId: string, code: string) =>
+      request<{ user: { id: string; phone: string; role: string }; token: string }>(
+        '/auth/verify-otp', { method: 'POST', body: JSON.stringify({ challengeId, code }) }
+      ),
+    me: () =>
+      request<{ user: { id: string; phone: string; role: string; isVerified: boolean } }>(
+        '/auth/me'
+      ),
+    logout: () =>
+      request<{ ok: boolean }>('/auth/logout', { method: 'POST' }),
+  },
+  drivers: {
+    register: (data: { name: string; vehicleMake: string; vehicleModel: string; vehicleColor: string; plateNumber: string }) =>
+      request<{ driver: unknown }>('/drivers/register', { method: 'POST', body: JSON.stringify(data) }),
+    profile: () => request<{ profile: unknown }>('/drivers/profile'),
+    approve: (id: string) => request<unknown>(`/drivers/${id}/approve`, { method: 'POST' }),
+  },
+  dashboard: {
+    get: () => request<unknown>('/dashboard'),
+  },
+  qr: {
+    replace: () => request<{ qr: unknown }>('/qr/replace', { method: 'POST' }),
+    /** Returns the URL of the QR PNG — use in an <img> src */
+    imageUrl: (taxiId: string) => `${API_BASE}/qr/${taxiId}.png`,
+  },
+  payments: {
+    initiate: (taxiId: string, farePresetId: string, returnUrl?: string) =>
+      request<{ transactionId: string; fare: unknown; checkoutUrl: string; providerReference: string }>(
+        '/payments/initiate', { method: 'POST', body: JSON.stringify({ taxiId, farePresetId, returnUrl }) }
+      ),
+  },
+}

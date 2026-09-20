@@ -1,0 +1,61 @@
+{
+  "auth": {
+    "title_passenger": "Passenger access",
+    "title_driver": "Driver access",
+    "subtitle": "Sign in with your phone. OTP is logged to the backend console in dev mode.",
+    "phone_label": "Phone number",
+    "phone_placeholder": "+251911234567",
+    "send_otp": "Send OTP",
+    "sending": "Sending…",
+    "otp_label": "6-digit code",
+    "verify": "Verify and continue",
+    "verifying": "Verifying…",
+    "dev_otp": "Dev OTP:"
+  },
+  "registration": {
+    "label": "Driver registration",
+    "title": "Join PayTaxi",
+    "subtitle": "Your profile is created as PENDING. An admin must approve it before a QR is issued.",
+    "submit": "Submit registration",
+    "submitting": "Submitting…",
+    "mock_id": "Mock ID upload",
+    "mock_license": "Mock license upload"
+  },
+  "payment": {
+    "title": "Pay a verified taxi",
+    "subtitle": "The server validates the taxi, driver approval, active QR, and fare preset. Client amounts are ignored.",
+    "taxi_id_label": "Taxi ID",
+    "continue_btn": "Continue to AddisPay",
+    "pending_btn": "Creating payment…",
+    "signed_in_as": "Signed in as"
+  },
+  "dashboard": {
+    "label": "Scoped driver portal",
+    "welcome": "Welcome, {name}",
+    "subtitle": "Only your driver profile and transactions are loaded from the server.",
+    "earnings": "Successful earnings",
+    "payments": "Successful payments",
+    "no_qr": "No QR yet",
+    "download_qr": "Download QR PNG",
+    "report_lost": "Report lost/stolen QR",
+    "replacing": "Replacing…",
+    "refresh": "Refresh dashboard",
+    "recent_tx": "Recent transactions",
+    "no_tx": "No transactions yet.",
+    "sign_out": "Sign out",
+    "log_out": "Log out"
+  },
+  "home": {
+    "tagline": "Verified rides. Server-checked payments.",
+    "heading": "Pay your taxi fare with confidence.",
+    "description": "PayTaxi links every payment to an approved driver and active QR. Drivers get a private dashboard for their own earnings.",
+    "pay_btn": "Pay a taxi",
+    "driver_btn": "Driver registration",
+    "passenger_login": "Passenger login",
+    "driver_portal": "Driver portal"
+  },
+  "nav": {
+    "brand_name": "PAYTAXI",
+    "brand_tagline": "Safer taxi payments in Ethiopia"
+  }
+}
