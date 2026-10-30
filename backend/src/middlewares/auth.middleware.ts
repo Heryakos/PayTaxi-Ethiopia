@@ -40,6 +40,33 @@ export const requireAuth = async (req: AuthenticatedRequest, res: Response, next
   }
 };
 
+export const optionalAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  let token: string | undefined;
+
+  const cookieToken = (req as any).cookies?.token as string | undefined;
+  if (cookieToken) {
+    token = cookieToken;
+  } else {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    }
+  }
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; role: string };
+      req.user = {
+        id: decoded.userId,
+        role: decoded.role,
+      };
+    } catch {
+      // Token is invalid/expired; continue as unauthenticated guest
+    }
+  }
+  next();
+};
+
 export const requireRole = (role: string) => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {

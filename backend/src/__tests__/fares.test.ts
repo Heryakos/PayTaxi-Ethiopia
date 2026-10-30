@@ -53,3 +53,59 @@ describe('canTransition()', () => {
     expect(canTransition('INVALID_STATE', 'SUCCESS')).toBe(false);
   });
 });
+
+describe('resolveFare() for Ethiopian Minibus Transit', () => {
+  const { resolveFare, FARE_PRESETS } = require('../services/fares');
+
+  test('resolves standard minibus preset with string argument', () => {
+    const fare = resolveFare('standard');
+    expect(fare).not.toBeNull();
+    expect(fare.amount).toBe(15);
+    expect(fare.currency).toBe('ETB');
+    expect(fare.passengerCount).toBe(1);
+  });
+
+  test('resolves short stage preset (10 ETB)', () => {
+    const fare = resolveFare({ presetId: 'short' });
+    expect(fare.amount).toBe(10);
+    expect(fare.unitAmount).toBe(10);
+    expect(fare.passengerCount).toBe(1);
+  });
+
+  test('multiplies fare by passenger count for multi-seat payment (e.g. 3 passengers x 15 ETB = 45 ETB)', () => {
+    const fare = resolveFare({ presetId: 'standard', passengerCount: 3 });
+    expect(fare.amount).toBe(45);
+    expect(fare.unitAmount).toBe(15);
+    expect(fare.passengerCount).toBe(3);
+    expect(fare.label).toContain('3 seats');
+  });
+
+  test('resolves custom fare within bounds (e.g. 12 ETB)', () => {
+    const fare = resolveFare({ customAmount: 12, passengerCount: 1 });
+    expect(fare).not.toBeNull();
+    expect(fare.amount).toBe(12);
+    expect(fare.id).toBe('custom');
+  });
+
+  test('multiplies custom fare by passenger count (2 x 12 ETB = 24 ETB)', () => {
+    const fare = resolveFare({ customAmount: 12, passengerCount: 2 });
+    expect(fare.amount).toBe(24);
+    expect(fare.passengerCount).toBe(2);
+  });
+
+  test('rejects custom fare below minimum 5 ETB', () => {
+    const fare = resolveFare({ customAmount: 3 });
+    expect(fare).toBeNull();
+  });
+
+  test('rejects custom fare above maximum 500 ETB', () => {
+    const fare = resolveFare({ customAmount: 600 });
+    expect(fare).toBeNull();
+  });
+
+  test('rejects unknown presetId', () => {
+    const fare = resolveFare({ presetId: 'non_existent_preset' });
+    expect(fare).toBeNull();
+  });
+});
+

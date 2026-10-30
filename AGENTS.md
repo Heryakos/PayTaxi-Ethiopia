@@ -31,9 +31,14 @@
 - QR logic (disable current ACTIVE, create new ACTIVE): `backend/src/services/drivers.service.ts#replaceLostQr`
 
 ### Payments
-- Initiate payment (server validates fare/taxi/driver): `backend/src/routes/payments.ts` → `POST /payments/initiate` (rate limited: 20/15min)
-- Fare presets (server-authoritative, client only sends preset ID): `backend/src/services/fares.ts`
+- Initiate payment (server validates fare/taxi/driver): `backend/src/routes/payments.ts` → `POST /payments/initiate` (rate limited: 30/15min)
+- **Guest passenger checkout**: `optionalAuth` middleware allows passengers to pay without forced login (`passengerUserId` is optional in DB)
+- **Minibus transit fare presets**: `backend/src/services/fares.ts` (10, 15, 20, 25, 35, 50 ETB) + multi-seat count multiplier + custom fares (5–500 ETB)
+- **Public transaction status / receipt**: `backend/src/routes/payments.ts` → `GET /payments/:id`
+- **Sandbox test simulation**: `backend/src/routes/payments.ts` → `POST /payments/:id/simulate-success`
+- **Weyala anti-fraud receipt**: Dynamic animated green receipt on web with live ticking timer, Ethiopian plate number badge, and anti-screenshot security code
 - Payment provider interface + sandbox: `backend/src/services/provider.ts` (AddisPaySandboxProvider)
+
 
 ### Webhooks
 - AddisPay callback: `backend/src/routes/webhooks.ts` → `POST /webhooks/addispay`
@@ -109,11 +114,12 @@ Migration `20260808085150_add_check_constraints` adds:
 ## Automated Tests
 - Location: `backend/src/__tests__/`
 - Run: `cd backend && npx jest --config jest.config.json`
-- `fares.test.ts` — state machine transitions (16 cases, valid + invalid + terminal + unknown)
+- `fares.test.ts` — state machine transitions (16 cases) + resolveFare presets/multipliers/bounds (8 cases)
 - `webhooks.test.ts` — idempotency, compare-and-set race, terminal state protection (9 cases)
 - `auth.service.test.ts` — OTP generation, hashing, attempt limits, expiration, and role validation
 - `drivers.service.test.ts` — registration, approval, and QR replacement flows
-- **Total: 42 tests, 4 suites, all passing**
+- **Total: 50 tests, 4 suites, all passing**
+
 - **Jest dependency pin**: root `package.json` → `pnpm.overrides` forces `jest-environment-node` to `30.4.1`. Without it, pnpm resolves `jest-runtime@30.4.2`'s `jest-environment-node` to `29.7.0` whose `jest-mock@29.7.0` moduleMocker lacks `clearMocksOnScope` → `TypeError` on suite start. Do not remove the override.
 
 ## Run Commands

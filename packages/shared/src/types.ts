@@ -35,11 +35,13 @@ export type DriverDashboard = {
 }
 
 export const FARE_PRESETS = [
-  { id: "short", label: "Short trip", amount: 80 },
-  { id: "standard", label: "Standard", amount: 150 },
-  { id: "medium", label: "Medium", amount: 220 },
-  { id: "long", label: "Long trip", amount: 300 },
-  { id: "airport", label: "Airport", amount: 450 },
+  { id: "short", label: "Short Stage / ቅርብ", amount: 10, description: "1–3 km" },
+  { id: "standard", label: "Standard / መደበኛ", amount: 15, description: "3–6 km" },
+  { id: "medium", label: "Medium / መካከለኛ", amount: 20, description: "6–9 km" },
+  { id: "long", label: "Long / ረጅም", amount: 25, description: "9–13 km" },
+  { id: "express", label: "Express / ኤክስፕረስ", amount: 35, description: "13–18 km" },
+  { id: "special", label: "Night / ልዩ", amount: 50, description: "Late / Long-zone" },
 ] as const
 
 export type FarePresetId = (typeof FARE_PRESETS)[number]["id"]
+

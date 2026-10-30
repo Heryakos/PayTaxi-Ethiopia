@@ -63,9 +63,62 @@ export const api = {
     imageUrl: (taxiId: string) => `${API_BASE}/qr/${taxiId}.png`,
   },
   payments: {
-    initiate: (taxiId: string, farePresetId: string, returnUrl?: string) =>
-      request<{ transactionId: string; fare: unknown; checkoutUrl: string; providerReference: string }>(
-        '/payments/initiate', { method: 'POST', body: JSON.stringify({ taxiId, farePresetId, returnUrl }) }
-      ),
+    initiate: (options: {
+      taxiId: string;
+      farePresetId?: string;
+      customAmount?: number;
+      passengerCount?: number;
+      passengerPhone?: string;
+      returnUrl?: string;
+    }) =>
+      request<{
+        transactionId: string;
+        fare: { amount: number; unitAmount?: number; passengerCount?: number; currency: string; label: string; id: string };
+        checkoutUrl: string;
+        providerReference: string;
+        taxi: { taxiId: string; driverName: string; plateNumber: string; vehicleMake: string | null; vehicleModel: string | null; vehicleColor: string | null };
+      }>('/payments/initiate', { method: 'POST', body: JSON.stringify(options) }),
+    getStatus: (id: string) =>
+      request<{
+        transaction: {
+          id: string;
+          status: string;
+          amount: number;
+          currency: string;
+          createdAt: string;
+          confirmedAt: string | null;
+          taxiId: string;
+          driver: {
+            displayName: string;
+            plateNumber: string;
+            vehicleMake: string | null;
+            vehicleModel: string | null;
+            vehicleColor: string | null;
+            rating: number;
+          };
+        };
+      }>(`/payments/${id}`),
+    simulateSuccess: (id: string) =>
+      request<{
+        success: boolean;
+        transaction: {
+          id: string;
+          status: string;
+          amount: number;
+          currency: string;
+          createdAt: string;
+          confirmedAt: string | null;
+          taxiId: string;
+          driver: {
+            displayName: string;
+            plateNumber: string;
+            vehicleMake: string | null;
+            vehicleModel: string | null;
+            vehicleColor: string | null;
+            rating: number;
+          };
+        };
+      }>(`/payments/${id}/simulate-success`, { method: 'POST' }),
   },
 }
+

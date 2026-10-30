@@ -9,12 +9,14 @@ import { useTranslation } from 'react-i18next'
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera'
 
 const FARE_PRESETS = [
-  { id: 'short', label: 'Short trip', amount: 80 },
-  { id: 'standard', label: 'Standard', amount: 150 },
-  { id: 'medium', label: 'Medium', amount: 220 },
-  { id: 'long', label: 'Long trip', amount: 300 },
-  { id: 'airport', label: 'Airport', amount: 450 },
+  { id: 'short', label: 'Short Stage (ቅርብ)', amount: 10 },
+  { id: 'standard', label: 'Standard (መደበኛ)', amount: 15 },
+  { id: 'medium', label: 'Medium (መካከለኛ)', amount: 20 },
+  { id: 'long', label: 'Long (ረጅም)', amount: 25 },
+  { id: 'express', label: 'Express (ኤክስፕረስ)', amount: 35 },
+  { id: 'special', label: 'Night (ልዩ)', amount: 50 },
 ]
+
 
 type Screen = 'home' | 'auth' | 'pay' | 'driver-dashboard' | 'driver-register'
 type UserRole = 'PASSENGER' | 'DRIVER' | 'ADMIN'

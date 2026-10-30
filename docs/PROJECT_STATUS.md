@@ -31,7 +31,13 @@ The single Next.js app is now a 3-part monorepo:
 | **Mobile QR scanner** | `mobile/App.tsx` — expo-camera `CameraView` in a Modal; parses `https://paytaxi.et/t/{taxiId}` |
 | **Mobile i18n** | `mobile/lib/i18n.ts` — react-i18next with English + Amharic for all screens |
 | **Frontend i18n** | `frontend/i18n/request.ts`, `frontend/messages/{en,am}.json`, and `paytaxi-app.tsx` — uses next-intl `useTranslations()`. Features a fully working language toggle in the header that sets `NEXT_LOCALE` and reloads. |
+| **Guest passenger checkout** | `POST /payments/initiate` via `optionalAuth` — unauthenticated passengers pay instantly without forced login |
+| **Ethiopian minibus fare stages** | `backend/src/services/fares.ts` & `@paytaxi/shared` — 10, 15, 20, 25, 35, 50 ETB presets with seat multiplier |
+| **Transaction status & receipt query** | `GET /payments/:id` via `backend/src/routes/payments.ts` — powers verified passenger & Weyala receipt |
+| **Sandbox instant test simulation** | `POST /payments/:id/simulate-success` — transitions pending transaction to success for live preview testing |
+| **Anti-fraud Weyala receipt** | `frontend/components/paytaxi-app.tsx` — animated green receipt with live ticking seconds, Ethiopian plate badge, and security code |
 | **Shared package wired into frontend** | `@paytaxi/shared` consumed via `frontend/tsconfig.json` path alias `@paytaxi/shared → ../packages/shared/src` + `transpilePackages` in `frontend/next.config.mjs`. `FARE_PRESETS` imported in `paytaxi-app.tsx`. |
+
 
 ## canTransition() call sites (all transaction status writes)
 | Write path | File | canTransition called? |
@@ -77,11 +83,12 @@ The single Next.js app is now a 3-part monorepo:
 - **QR codes**: Generated server-side as real PNG using `qrcode` npm package. Payload is `https://paytaxi.et/t/{taxiId}` — compatible with iOS Universal Links and Android App Links. Falls back to browser when app is not installed. (Custom schemes like `paytaxi://` would break the no-install fallback.)
 
 - **Automated Tests**:
-  - `backend/src/__tests__/fares.test.ts` — covers all valid/invalid `canTransition()` state machine transitions (16 cases)
+  - `backend/src/__tests__/fares.test.ts` — covers all valid/invalid state transitions (16 cases) + resolveFare presets/multipliers/bounds (8 cases)
   - `backend/src/__tests__/webhooks.test.ts` — covers idempotency, compare-and-set race conditions, and terminal state protection
   - `backend/src/__tests__/auth.service.test.ts` — covers OTP generation, hashing, attempt limits, expiration, and role validation
   - `backend/src/__tests__/drivers.service.test.ts` — covers registration, approval, and QR replacement flows
-  - **Result**: 42 tests, 4 suites, all passing ✅
+  - **Result**: 50 tests, 4 suites, all passing ✅
+
 
 ## Resolved known limitations (from previous status)
 | Previously flagged | Resolution |
