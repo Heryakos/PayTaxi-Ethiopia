@@ -10,6 +10,10 @@
       "@parcel/watcher",
       "@swc/core",
       "unrs-resolver"
-    ]
+    ],
+    "overrides": {
+      "hono": "4.12.25",
+      "jest-environment-node": "30.4.1"
+    }
   }
 }

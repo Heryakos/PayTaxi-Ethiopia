@@ -19,6 +19,7 @@ The single Next.js app is now a 3-part monorepo:
 | Admin driver approval + QR issuance | `POST /drivers/:id/approve` via `backend/src/routes/drivers.ts` |
 | QR replace-on-lost | `POST /qr/replace` via `backend/src/routes/qr.ts` |
 | **QR PNG generation** | `GET /qr/:taxiId.png` — real scannable PNG via `qrcode` npm package. Encodes `https://paytaxi.et/t/{taxiId}` |
+| **Public taxi verify (deep-link page)** | `GET /qr/:taxiId` — approved driver info, powers web `/t/{taxiId}` landing (fetch + pay) |
 | Fare server validation | `backend/src/services/fares.ts` — client only sends preset ID |
 | Payment initiation | `POST /payments/initiate` via `backend/src/routes/payments.ts` |
 | Transaction state machine | `backend/src/services/fares.ts#canTransition` |
@@ -30,6 +31,7 @@ The single Next.js app is now a 3-part monorepo:
 | **Mobile QR scanner** | `mobile/App.tsx` — expo-camera `CameraView` in a Modal; parses `https://paytaxi.et/t/{taxiId}` |
 | **Mobile i18n** | `mobile/lib/i18n.ts` — react-i18next with English + Amharic for all screens |
 | **Frontend i18n** | `frontend/i18n/request.ts`, `frontend/messages/{en,am}.json`, and `paytaxi-app.tsx` — uses next-intl `useTranslations()`. Features a fully working language toggle in the header that sets `NEXT_LOCALE` and reloads. |
+| **Shared package wired into frontend** | `@paytaxi/shared` consumed via `frontend/tsconfig.json` path alias `@paytaxi/shared → ../packages/shared/src` + `transpilePackages` in `frontend/next.config.mjs`. `FARE_PRESETS` imported in `paytaxi-app.tsx`. |
 
 ## canTransition() call sites (all transaction status writes)
 | Write path | File | canTransition called? |
@@ -60,9 +62,10 @@ The single Next.js app is now a 3-part monorepo:
 ## Database
 - **Provider**: SQL Server (local — `DESKTOP-SI08CAC\paytaxi`)
 - **Config**: Zero-arg PrismaClient with schema URL
-- **Migration status**: ✅ 2 migrations applied:
+- **Migration status**: ✅ 3 migrations applied:
   - `20260808074951_init` — full schema
   - `20260808085150_add_check_constraints` — enum-equivalent CHECK constraints
+  - `20260920120732_widen_raw_payload_columns` — `rawPayload`/`addispayRawPayload` widened to NVARCHAR(4000) so full webhook JSON fits
 - **Seed**: ✅ Complete with admin (`+251911111111`), driver (`+251922222222`, `TX-1001`), and passenger (`+251933333333`)
 - **To switch to Supabase/PostgreSQL**: change `provider = "postgresql"` in `schema.prisma`, delete `prisma.config.ts`, update `DATABASE_URL`
 
@@ -84,17 +87,20 @@ The single Next.js app is now a 3-part monorepo:
 | Previously flagged | Resolution |
 |---|---|
 | "Webhook race — zero affected rows assumed success" | ✅ Fixed: re-reads current status, distinguishes idempotent vs conflict, logs structured warning on conflict |
+| "Webhook raw payload stored as object into String field" | ✅ Fixed: `JSON.stringify` before write (`webhooks.ts`) + columns widened to NVARCHAR(4000) |
 | "QR image — returns payload URL string, not an image" | ✅ Fixed: `GET /qr/:taxiId.png` returns a real scannable 512×512 PNG |
 | "JWT in localStorage" | ✅ Fixed: httpOnly cookie for web, expo-secure-store for mobile |
 | "Dead /frontend/app/api/** routes" | ✅ Deleted |
 | "i18n not implemented" | ✅ Implemented: next-intl (frontend, wired into components), react-i18next (mobile) with en + am |
 | "Camera permission fallback" | ✅ Confirmed: `mobile/App.tsx` handles denied permissions gracefully by showing a message and 'Cancel' button to fallback to manual text input. |
 | "CORS config" | ✅ Confirmed: `backend/src/index.ts` explicitly checks `allowedOrigins` (including `http://localhost:3000` and expo LAN IPs) and uses `credentials: true`. |
+| "Dead v0 `frontend/lib/{auth,db,drivers,payments,shared}` and `frontend/scripts/db-setup.mjs`" | ✅ Deleted. Dead deps `drizzle-orm`, `pg`, `@types/pg` removed (211 packages pruned). Package renamed `my-project` → `paytaxi-frontend`. |
+| "`@paytaxi/shared` unused (dist unbuilt)" | ✅ Wired: frontend imports `FARE_PRESETS` from `@paytaxi/shared` via tsconfig path to `src` + `transpilePackages`. |
+| "`pnpm.overrides` warning in frontend" | ✅ Moved `hono` override to root `package.json`. Root `pnpm.overrides` now also forces `jest-environment-node@30.4.1` (fixes the jest 29/30 moduleMocker `clearMocksOnScope` crash). |
 
 ## Known remaining gaps
 - `app_session` table kept for schema compatibility but superseded by JWT — safe to drop in a future migration.
 - Payout reconciliation, admin console, real AddisPay, NFC — deferred by design.
-- `pnpm.overrides` warning in frontend — move the override block to root `package.json` to silence.
 
 ## How to run locally
 

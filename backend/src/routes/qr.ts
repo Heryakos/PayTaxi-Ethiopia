@@ -54,4 +54,33 @@ router.get('/:taxiId.png', async (req, res) => {
   }
 });
 
+// GET /qr/:taxiId — public driver verification info.
+// Must be registered AFTER /:taxiId.png so PNG requests aren't swallowed.
+// Powers the web deep-link landing page at /t/{taxiId}. No auth required.
+router.get('/:taxiId', async (req, res) => {
+  const { taxiId } = req.params;
+  const qr = await prisma.taxiQr.findFirst({
+    where: {
+      taxiId,
+      status: 'ACTIVE',
+      driverProfile: { verificationStatus: 'APPROVED' }
+    },
+    include: { driverProfile: true }
+  });
+  if (!qr) {
+    return res.status(404).json({ error: 'No active QR for this taxi ID or driver not approved' });
+  }
+  res.json({
+    taxiId: qr.taxiId,
+    driver: {
+      displayName: qr.driverProfile.displayName,
+      plateNumber: qr.driverProfile.plateNumber,
+      vehicleMake: qr.driverProfile.vehicleMake,
+      vehicleModel: qr.driverProfile.vehicleModel,
+      vehicleColor: qr.driverProfile.vehicleColor,
+      rating: Number(qr.driverProfile.rating),
+    }
+  });
+});
+
 export default router;

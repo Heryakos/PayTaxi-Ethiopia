@@ -10,6 +10,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  transpilePackages: ['@paytaxi/shared'],
 }
 
 export default withNextIntl(nextConfig)

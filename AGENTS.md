@@ -5,7 +5,7 @@
 - `/frontend` — Next.js 16 App Router UI. Calls `/backend` over HTTP. No DB access, no Prisma. Auth via httpOnly cookie.
 - `/backend` — Express + Prisma API server. All business logic, auth, payments, webhooks live here.
 - `/mobile` — React Native (Expo) app. Calls `/backend` over HTTP using `lib/api.ts`. Auth via expo-secure-store + Bearer header.
-- `/packages/shared` — Shared TypeScript types (`types.ts`) and browser API client (`api-client.ts`). Cookie-based, no localStorage.
+- `/packages/shared` — Shared TypeScript types (`types.ts`) and browser API client (`api-client.ts`). Cookie-based, no localStorage. **Consumed by the frontend** via `frontend/tsconfig.json` path alias `@paytaxi/shared → ../packages/shared/src` + `transpilePackages` in `frontend/next.config.mjs` (package.json `main` points at unbuilt `dist`, so always import from src through the alias). Backend does NOT import shared — it is the source of truth for `FARE_PRESETS`/`canTransition`.
 - `/docs` — `PROJECT_STATUS.md`, `ARCHITECTURE.md`.
 
 ## Feature Implementation Map
@@ -27,6 +27,7 @@
 ### QR Lifecycle
 - Replace lost/stolen QR: `backend/src/routes/qr.ts` → `POST /qr/replace`
 - **QR PNG generation**: `backend/src/routes/qr.ts` → `GET /qr/:taxiId.png` — real PNG via `qrcode` npm, encodes `https://paytaxi.et/t/{taxiId}`
+- **Public taxi verify (deep-link page)**: `backend/src/routes/qr.ts` → `GET /qr/:taxiId` — returns approved driver info, powers web `/t/{taxiId}`. Must stay registered AFTER `/:taxiId.png`
 - QR logic (disable current ACTIVE, create new ACTIVE): `backend/src/services/drivers.service.ts#replaceLostQr`
 
 ### Payments
@@ -113,6 +114,7 @@ Migration `20260808085150_add_check_constraints` adds:
 - `auth.service.test.ts` — OTP generation, hashing, attempt limits, expiration, and role validation
 - `drivers.service.test.ts` — registration, approval, and QR replacement flows
 - **Total: 42 tests, 4 suites, all passing**
+- **Jest dependency pin**: root `package.json` → `pnpm.overrides` forces `jest-environment-node` to `30.4.1`. Without it, pnpm resolves `jest-runtime@30.4.2`'s `jest-environment-node` to `29.7.0` whose `jest-mock@29.7.0` moduleMocker lacks `clearMocksOnScope` → `TypeError` on suite start. Do not remove the override.
 
 ## Run Commands
 - **Backend**: `cd backend && pnpm dev` — requires `backend/.env` with `DATABASE_URL`

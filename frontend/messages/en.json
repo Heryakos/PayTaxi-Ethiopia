@@ -57,5 +57,10 @@
   "nav": {
     "brand_name": "PAYTAXI",
     "brand_tagline": "Safer taxi payments in Ethiopia"
+  },
+  "taxi": {
+    "verified": "Verified taxi",
+    "pay": "Pay this taxi",
+    "pay_signin": "Sign in & pay"
   }
 }

@@ -3,19 +3,16 @@
 import { useEffect, useState } from "react"
 import { BadgeCheck, Check, Clock3, LogOut, QrCode, ShieldCheck, Smartphone, WalletCards, Globe } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { FARE_PRESETS } from "@paytaxi/shared"
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
 
-const FARE_PRESETS = [
-  { id: "short", label: "Short trip", amount: 80 },
-  { id: "standard", label: "Standard", amount: 150 },
-  { id: "medium", label: "Medium", amount: 220 },
-  { id: "long", label: "Long trip", amount: 300 },
-  { id: "airport", label: "Airport", amount: 450 },
-]
-
 type UserRole = "PASSENGER" | "DRIVER" | "ADMIN"
 type User = { id: string; phone: string; role: UserRole }
+type TaxiPublicInfo = {
+  taxiId: string
+  driver: { displayName: string; plateNumber: string; vehicleMake: string | null; vehicleModel: string | null; vehicleColor: string | null; rating: number }
+}
 type DriverDashboardData = {
   driver: { displayName: string; plateNumber: string; vehicleMake: string | null; vehicleModel: string | null; vehicleColor: string | null; verificationStatus: string }
   qr: { taxiId: string; status: string; backupCode: string | null } | null
@@ -159,9 +156,9 @@ function DriverRegistration({ onDone }: { onDone: (data: DriverDashboardData) =>
 }
 
 // ---------- Passenger Pay ----------
-function PassengerPay({ user, onBack }: { user: User | null; onBack: () => void }) {
+function PassengerPay({ user, onBack, initialTaxiId }: { user: User | null; onBack: () => void; initialTaxiId?: string }) {
   const t = useTranslations("payment")
-  const [taxiId, setTaxiId] = useState("TX-1001")
+  const [taxiId, setTaxiId] = useState(initialTaxiId ?? "TX-1001")
   const [farePresetId, setFarePresetId] = useState("medium")
   const [state, setState] = useState<"idle" | "pending" | "error">("idle")
   const [message, setMessage] = useState("")
@@ -275,13 +272,23 @@ function DriverDashboard({ data, onRefresh, onLogout }: { data: DriverDashboardD
 }
 
 // ---------- Root App ----------
-export default function PayTaxiApp() {
+export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }) {
   const tHome = useTranslations("home")
   const tNav = useTranslations("nav")
+  const tTaxi = useTranslations("taxi")
   const [view, setView] = useState<"loading" | "home" | "auth" | "pay" | "driver-register" | "dashboard">("loading")
   const [authRole, setAuthRole] = useState<UserRole>("PASSENGER")
   const [user, setUser] = useState<User | null>(null)
   const [dashboard, setDashboard] = useState<DriverDashboardData | null>(null)
+  const [taxiInfo, setTaxiInfo] = useState<TaxiPublicInfo | null>(null)
+
+  // Load public driver info for the QR deep-link page (/t/{taxiId})
+  useEffect(() => {
+    if (!initialTaxiId) return
+    apiFetch(`/qr/${initialTaxiId}`)
+      .then((d: TaxiPublicInfo) => setTaxiInfo(d))
+      .catch(() => setTaxiInfo(null))
+  }, [initialTaxiId])
 
   // Restore session via GET /auth/me — reads the httpOnly cookie automatically.
   // No localStorage access needed.
@@ -291,12 +298,14 @@ export default function PayTaxiApp() {
         setUser(data.user)
         if (data.user.role === "DRIVER") {
           return apiFetch("/dashboard").then((d) => { setDashboard(d); setView("dashboard") })
+        } else if (initialTaxiId) {
+          setView("pay") // passenger scanned/opened a taxi — go straight to pay
         } else {
           setView("home") // passenger — go to home, let them initiate a payment
         }
       })
       .catch(() => setView("home")) // no session, show home
-  }, [])
+  }, [initialTaxiId])
 
   const loadDashboard = async () => {
     try { const data = await apiFetch("/dashboard"); setDashboard(data); setView("dashboard") }
@@ -347,6 +356,24 @@ export default function PayTaxiApp() {
       </header>
       {view === "home" && (
         <main className="mx-auto max-w-5xl px-4 py-20 sm:px-8">
+          {taxiInfo && (
+            <div className="mb-10 rounded-3xl border border-primary/20 bg-primary/5 p-6 sm:p-8">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+                    <BadgeCheck className="size-3.5" />{tTaxi("verified")}
+                  </div>
+                  <h2 className="mt-4 text-2xl font-bold">{taxiInfo.taxiId} · {taxiInfo.driver.displayName}</h2>
+                  <p className="mt-2 text-muted-foreground">
+                    {taxiInfo.driver.plateNumber} · {taxiInfo.driver.vehicleMake ?? ""} {taxiInfo.driver.vehicleModel ?? ""} {taxiInfo.driver.vehicleColor ?? ""}
+                  </p>
+                </div>
+                <button onClick={() => { setAuthRole("PASSENGER"); setView(user ? "pay" : "auth") }} className="rounded-xl bg-primary px-5 py-3 font-semibold text-primary-foreground">
+                  {user ? tTaxi("pay") : tTaxi("pay_signin")}
+                </button>
+              </div>
+            </div>
+          )}
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary">
               <BadgeCheck className="size-3.5" />{tHome("tagline")}
@@ -361,7 +388,7 @@ export default function PayTaxiApp() {
         </main>
       )}
       {view === "auth" && <OtpAuth role={authRole} onSuccess={authenticated} onBack={() => setView("home")} />}
-      {view === "pay" && <PassengerPay user={user} onBack={() => setView("home")} />}
+      {view === "pay" && <PassengerPay user={user} onBack={() => setView("home")} initialTaxiId={initialTaxiId} />}
       {view === "driver-register" && <DriverRegistration onDone={(data) => { setDashboard(data); setView("dashboard") }} />}
       {view === "dashboard" && dashboard && <DriverDashboard data={dashboard} onRefresh={loadDashboard} onLogout={signOut} />}
       <footer className="border-t border-border px-4 py-6 text-center text-xs text-muted-foreground">

@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@paytaxi/shared": ["../packages/shared/src"]
     }
   },
   "include": [

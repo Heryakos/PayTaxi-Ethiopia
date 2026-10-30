@@ -37,7 +37,7 @@ router.post('/addispay', async (req, res) => {
           providerEventId: eventId,
           eventType: body.eventType ?? null,
           transactionId,
-          rawPayload: body,
+          rawPayload: rawBody,
           processed: false,
         }
       });
@@ -72,7 +72,7 @@ router.post('/addispay', async (req, res) => {
         data: {
           status: nextStatus,
           addispayTransactionRef: body.providerReference ?? current.addispayTransactionRef,
-          addispayRawPayload: body,
+          addispayRawPayload: JSON.stringify(body),
           updatedAt: new Date(),
           confirmedAt: nextStatus === 'SUCCESS' ? new Date() : current.confirmedAt
         }

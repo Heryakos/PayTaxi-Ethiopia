@@ -102,7 +102,7 @@ model Transaction {
   currency               String    @default("ETB")
   status                 String    @default("PENDING") // PENDING | SUCCESS | FAILED | REFUNDED | UNKNOWN
   addispayTransactionRef String?   @unique
-  addispayRawPayload     String?   // JSON stored as text in SQL Server
+  addispayRawPayload     String?   @db.NVarChar(4000) // JSON stored as text in SQL Server
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @default(now()) @updatedAt
   confirmedAt            DateTime?
@@ -124,7 +124,7 @@ model WebhookEvent {
   providerEventId String
   eventType       String?
   transactionId   String?
-  rawPayload      String?  // JSON stored as text in SQL Server
+  rawPayload      String?  @db.NVarChar(4000) // JSON stored as text in SQL Server
   processed       Boolean  @default(false)
   receivedAt      DateTime @default(now())
 

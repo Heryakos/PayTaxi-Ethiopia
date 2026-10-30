@@ -57,5 +57,10 @@
   "nav": {
     "brand_name": "PAYTAXI",
     "brand_tagline": "ደህንነቱ የተጠበቀ ታክሲ ክፍያ"
+  },
+  "taxi": {
+    "verified": "የተረጋገጠ ታክሲ",
+    "pay": "ይህን ታክሲ ክፈል",
+    "pay_signin": "ግባ እና ክፈል"
   }
 }
