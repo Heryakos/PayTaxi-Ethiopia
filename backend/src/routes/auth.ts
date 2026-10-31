@@ -10,16 +10,17 @@ const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-for-dev';
 
 const IS_PROD = process.env.NODE_ENV === 'production';
 
-// Cookie options: httpOnly so JS can't read it, sameSite strict for CSRF protection.
-// NOTE: sameSite:'strict' requires frontend & backend to share the same registrable domain
-// (e.g. paytaxi.et for both). It will silently fail in cross-domain deployments.
+// Cookie options:
+// - Production (cross-domain e.g. Vercel frontend + Render backend): sameSite: 'none', secure: true
+// - Development (localhost): sameSite: 'lax', secure: false
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: IS_PROD,
-  sameSite: 'strict' as const,
+  sameSite: IS_PROD ? ('none' as const) : ('lax' as const),
   maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   path: '/',
 };
+
 
 const otpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

@@ -3,6 +3,8 @@ import { prisma } from '../db/prisma';
 import { canTransition } from '../services/fares';
 import { paymentProvider } from '../services/provider';
 import { Prisma } from '@prisma/client';
+import { broadcastPaymentSuccess } from '../services/events.service';
+
 
 type TransactionStatus = string;
 
@@ -126,7 +128,26 @@ router.post('/addispay', async (req, res) => {
       source: 'webhook_addispay'
     }));
 
+    if (nextStatus === 'SUCCESS') {
+      const txFull = await prisma.transaction.findUnique({
+        where: { id: transactionId },
+        include: { qr: true }
+      });
+      if (txFull) {
+        broadcastPaymentSuccess({
+          transactionId: txFull.id,
+          driverProfileId: txFull.driverProfileId,
+          taxiId: txFull.qr.taxiId,
+          amount: Number(txFull.amount),
+          currency: txFull.currency,
+          seats: 1,
+          confirmedAt: (txFull.confirmedAt || new Date()).toISOString()
+        });
+      }
+    }
+
     res.json({ received: true, processed: true, status: nextStatus });
+
   } catch (error) {
     res.status(400).json({ error: (error as Error).message });
   }

@@ -21,6 +21,8 @@ export const requireAuth = async (req: AuthenticatedRequest, res: Response, next
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       token = authHeader.split(' ')[1];
+    } else if (req.query?.token && typeof req.query.token === 'string') {
+      token = req.query.token;
     }
   }
 
@@ -50,6 +52,8 @@ export const optionalAuth = async (req: AuthenticatedRequest, res: Response, nex
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       token = authHeader.split(' ')[1];
+    } else if (req.query?.token && typeof req.query.token === 'string') {
+      token = req.query.token;
     }
   }
 

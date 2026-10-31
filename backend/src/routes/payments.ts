@@ -5,7 +5,10 @@ import { resolveFare, canTransition } from '../services/fares';
 import { paymentProvider } from '../services/provider';
 import { prisma } from '../db/prisma';
 
+import { broadcastPaymentSuccess } from '../services/events.service';
+
 const router = Router();
+
 
 const paymentLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -189,7 +192,19 @@ router.post('/:id/simulate-success', async (req, res) => {
       source: 'simulate_sandbox_success'
     }));
 
+    broadcastPaymentSuccess({
+      transactionId: updated.id,
+      driverProfileId: updated.driverProfileId,
+      taxiId: updated.qr.taxiId,
+      amount: Number(updated.amount),
+      currency: updated.currency,
+      seats: 1,
+      passengerPhone: null,
+      confirmedAt: (updated.confirmedAt || new Date()).toISOString()
+    });
+
     res.json({
+
       success: true,
       transaction: {
         id: updated.id,

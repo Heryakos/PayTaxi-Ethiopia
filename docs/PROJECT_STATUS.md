@@ -35,7 +35,13 @@ The single Next.js app is now a 3-part monorepo:
 | **Ethiopian minibus fare stages** | `backend/src/services/fares.ts` & `@paytaxi/shared` — 10, 15, 20, 25, 35, 50 ETB presets with seat multiplier |
 | **Transaction status & receipt query** | `GET /payments/:id` via `backend/src/routes/payments.ts` — powers verified passenger & Weyala receipt |
 | **Sandbox instant test simulation** | `POST /payments/:id/simulate-success` — transitions pending transaction to success for live preview testing |
-| **Anti-fraud Weyala receipt** | `frontend/components/paytaxi-app.tsx` — animated green receipt with live ticking seconds, Ethiopian plate badge, and security code |
+| **Anti-fraud Weyala receipt** | `frontend/components/paytaxi-app.tsx` & `mobile/App.tsx` — animated green receipt with live ticking seconds, Ethiopian plate badge, and security code |
+| **Driver Soundbox (Real-Time Audio)** | `frontend/components/paytaxi-app.tsx` & `backend/src/services/events.service.ts` — Web Audio API dual-tone chime (587 & 880 Hz) + Web Speech voice synthesis on `/dashboard/stream` SSE events |
+| **Admin Driver Verification Portal** | `frontend/components/paytaxi-app.tsx` & `backend/src/routes/drivers.ts` — Admin portal with tab filters (All/Pending/Approved/Rejected), document modal previews, and one-click QR generation |
+| **Driver Document Upload (KYC)** | `frontend/components/paytaxi-app.tsx` — Instant image upload and thumbnail preview for National ID and Driver License |
+| **Supabase PostgreSQL Schema** | `backend/prisma/schema.supabase.prisma` — Turnkey PostgreSQL schema for Supabase deployment with `pnpm db:push:supabase` |
+| **Android Standalone APK (EAS)** | `mobile/eas.json` & `mobile/App.tsx` — Ready for physical Android testing outside Wi-Fi via `eas build -p android --profile preview` |
+| **Deployment & Operations Manual** | `docs/PAYTAXI_MANUAL.md` — Complete master guide for Supabase, Render, Vercel, and physical testing |
 | **Shared package wired into frontend** | `@paytaxi/shared` consumed via `frontend/tsconfig.json` path alias `@paytaxi/shared → ../packages/shared/src` + `transpilePackages` in `frontend/next.config.mjs`. `FARE_PRESETS` imported in `paytaxi-app.tsx`. |
 
 

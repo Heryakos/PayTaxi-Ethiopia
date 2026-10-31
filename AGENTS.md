@@ -20,9 +20,18 @@
 
 ### Driver Registration & Verification
 - Register driver (PENDING): `backend/src/routes/drivers.ts` → `POST /drivers/register`
+- Driver KYC upload: `backend/src/routes/drivers.ts` → `POST /drivers/upload` (National ID / License)
 - Admin approve (APPROVED + QR issuance): `backend/src/routes/drivers.ts` → `POST /drivers/:id/approve`
+- Admin reject: `backend/src/routes/drivers.ts` → `POST /drivers/:id/reject`
+- Admin list all: `backend/src/routes/drivers.ts` → `GET /drivers/admin/all`
 - Driver profile fetch: `backend/src/routes/drivers.ts` → `GET /drivers/profile`
 - Service logic: `backend/src/services/drivers.service.ts`
+
+### Driver Dashboard & Real-Time Soundbox
+- Aggregated earnings + recent transactions: `backend/src/routes/dashboard.ts` → `GET /dashboard`
+- **Real-Time Soundbox SSE Stream**: `backend/src/routes/dashboard.ts` → `GET /dashboard/stream` (EventSource)
+- Soundbox audio engine: `frontend/components/paytaxi-app.tsx` — Web Audio API dual-tone chime (587 & 880 Hz) + Web Speech voice synthesis on `PAYMENT_SUCCESS` events
+- Event hub: `backend/src/services/events.service.ts` → `broadcastPaymentSuccess()`
 
 ### QR Lifecycle
 - Replace lost/stolen QR: `backend/src/routes/qr.ts` → `POST /qr/replace`
@@ -36,9 +45,8 @@
 - **Minibus transit fare presets**: `backend/src/services/fares.ts` (10, 15, 20, 25, 35, 50 ETB) + multi-seat count multiplier + custom fares (5–500 ETB)
 - **Public transaction status / receipt**: `backend/src/routes/payments.ts` → `GET /payments/:id`
 - **Sandbox test simulation**: `backend/src/routes/payments.ts` → `POST /payments/:id/simulate-success`
-- **Weyala anti-fraud receipt**: Dynamic animated green receipt on web with live ticking timer, Ethiopian plate number badge, and anti-screenshot security code
+- **Weyala anti-fraud receipt**: Dynamic animated green receipt on web and mobile with live ticking timer, Ethiopian plate number badge, and anti-screenshot security code
 - Payment provider interface + sandbox: `backend/src/services/provider.ts` (AddisPaySandboxProvider)
-
 
 ### Webhooks
 - AddisPay callback: `backend/src/routes/webhooks.ts` → `POST /webhooks/addispay`
@@ -47,19 +55,19 @@
 - State machine (legal transitions): `backend/src/services/fares.ts#canTransition`
 - **canTransition() is called on every webhook status write. Payment initiation bypasses it (PENDING is always a valid start state).**
 
-### Driver Dashboard
-- Aggregated earnings + recent transactions: `backend/src/routes/dashboard.ts` → `GET /dashboard`
-- Aggregation logic: `backend/src/services/drivers.service.ts#getScopedDashboard`
+### Admin Portal & Operations
+- UI: `AdminPortal` in `frontend/components/paytaxi-app.tsx`
+- Operations & Deployment Manual: `docs/PAYTAXI_MANUAL.md`
 
 ### i18n
 - Frontend: `next-intl` — plugin in `frontend/next.config.mjs`, locale via `NEXT_LOCALE` cookie, messages in `frontend/messages/{en,am}.json`, config at `frontend/i18n/request.ts`, wired into `paytaxi-app.tsx` with a language toggle button
 - Mobile: `react-i18next` — configured in `mobile/lib/i18n.ts` with inline en/am translations; call `i18n.changeLanguage('am')` to switch
 
 ## Database (Prisma)
-- Schema: `backend/prisma/schema.prisma`
+- Schema: `backend/prisma/schema.prisma` (SQL Server) and `backend/prisma/schema.supabase.prisma` (Supabase PostgreSQL)
 - Provider config: `backend/prisma.config.ts` (Prisma 7 — url moved out of schema.prisma)
-- **Current provider: `sqlserver`** (local DESKTOP-SI08CAC / `paytaxi` database)
-- **To switch to Supabase/PostgreSQL**: change `provider = "postgresql"` in schema.prisma, delete `prisma.config.ts`, set `DATABASE_URL` to Supabase connection string.
+- **Current local provider: `sqlserver`** (local DESKTOP-SI08CAC / `paytaxi` database)
+- **Supabase/PostgreSQL Turnkey**: Run `pnpm db:push:supabase` and `pnpm prisma:generate:supabase` with `DATABASE_URL` pointing to Supabase.
 - Seed: `backend/prisma/seed.ts` (run: `cd backend && pnpm prisma:seed`)
 
 ### Table Summary

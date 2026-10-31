@@ -63,6 +63,9 @@
     "subtitle": "ከሰርቨሩ የሚጫነው የርሶ ሹፌር መገለጫ እና ግብይቶች ብቻ ናቸው።",
     "earnings": "ተሳካ ደሞዝ",
     "payments": "ተሳካ ክፍያዎች",
+    "soundbox_active": "🔊 ሳውንድቦክስ፡ የድምፅ ማሳወቂያ በርቷል",
+    "soundbox_muted": "🔈 ሳውንድቦክስ፡ ድምፅ ጠፍቷል (ለማብራት ይጫኑ)",
+    "payment_alert": "⚡ አሁን +{amount} ብር ክፍያ ደርሶዎታል!",
     "no_qr": "QR እስካሁን የለም",
     "download_qr": "QR PNG አውርድ",
     "report_lost": "ጠፋ/ተሰረቀ QR ሪፖርት",
@@ -73,6 +76,24 @@
     "sign_out": "ውጣ",
     "log_out": "ወጣ"
   },
+  "admin": {
+    "title": "የአስተዳዳሪ ሹፌሮች ማረጋገጫ",
+    "subtitle": "የሹፌሮችን መረጃ እና ሰነዶች (መታወቂያ እና ፍቃድ) በማየት QR ኮድ ይስጡ።",
+    "all_tab": "ሁሉም ማመልከቻዎች",
+    "pending_tab": "በመጠባበቅ ላይ",
+    "approved_tab": "የፀደቁ",
+    "rejected_tab": "ውድቅ የተደረጉ",
+    "approve_btn": "አጽድቅ እና QR ስጥ",
+    "reject_btn": "ማመልከቻውን ውድቅ አድርግ",
+    "approving": "እያጸደቀ…",
+    "rejecting": "ውድቅ እያደረገ…",
+    "no_drivers": "በዚህ ክፍል ምንም የሹፌር ማመልከቻ የለም።",
+    "id_document": "ብሔራዊ መታወቂያ (ቀበሌ / ፋይዳ)",
+    "license_document": "የመንጃ ፍቃድ",
+    "taxi_assigned": "የተሰጠ የታክሲ መለያ",
+    "plate_number": "የሰሌዳ ቁጥር"
+  },
+
   "home": {
     "tagline": "የተረጋገጡ ጉዞዎች። ሰርቨር-ያረጋገጡ ክፍያዎች።",
     "heading": "ያለ ሰቆቃ ታክሲ ክፍያዎን ይፈፅሙ።",

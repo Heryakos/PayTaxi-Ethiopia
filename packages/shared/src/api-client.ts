@@ -49,14 +49,44 @@ export const api = {
       request<{ ok: boolean }>('/auth/logout', { method: 'POST' }),
   },
   drivers: {
-    register: (data: { name: string; vehicleMake: string; vehicleModel: string; vehicleColor: string; plateNumber: string }) =>
+    register: (data: {
+      name: string;
+      vehicleMake: string;
+      vehicleModel: string;
+      vehicleColor: string;
+      plateNumber: string;
+      nationalIdUrl?: string;
+      licenseUrl?: string;
+    }) =>
       request<{ driver: unknown }>('/drivers/register', { method: 'POST', body: JSON.stringify(data) }),
     profile: () => request<{ profile: unknown }>('/drivers/profile'),
+    listAll: (status?: string) =>
+      request<{ drivers: Array<{
+        id: string;
+        userId: string;
+        phone: string;
+        displayName: string;
+        plateNumber: string;
+        vehicleMake: string | null;
+        vehicleModel: string | null;
+        vehicleColor: string | null;
+        verificationStatus: string;
+        nationalIdUrl: string | null;
+        licenseUrl: string | null;
+        activeTaxiId: string | null;
+        rating: number;
+        createdAt: string;
+      }> }>(`/drivers/admin/all${status ? `?status=${status}` : ''}`),
     approve: (id: string) => request<unknown>(`/drivers/${id}/approve`, { method: 'POST' }),
+    reject: (id: string, reason?: string) => request<unknown>(`/drivers/${id}/reject`, { method: 'POST', body: JSON.stringify({ reason }) }),
+    upload: (dataUrl: string, docType?: string) =>
+      request<{ url: string; docType: string }>(`/drivers/upload`, { method: 'POST', body: JSON.stringify({ dataUrl, docType }) }),
   },
   dashboard: {
     get: () => request<unknown>('/dashboard'),
+    streamUrl: (token?: string) => `${API_BASE}/dashboard/stream${token ? `?token=${encodeURIComponent(token)}` : ''}`,
   },
+
   qr: {
     replace: () => request<{ qr: unknown }>('/qr/replace', { method: 'POST' }),
     /** Returns the URL of the QR PNG — use in an <img> src */

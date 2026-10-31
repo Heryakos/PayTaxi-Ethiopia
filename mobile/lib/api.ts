@@ -42,17 +42,31 @@ export const mobileApi = {
     register: (data: object) =>
       request<{ driver: unknown }>('/drivers/register', { method: 'POST', body: JSON.stringify(data) }),
     profile: () => request<{ profile: unknown }>('/drivers/profile'),
+    listAll: (status?: string) =>
+      request<{ drivers: any[] }>(`/drivers/admin/all${status ? `?status=${status}` : ''}`),
+    approve: (id: string) =>
+      request<{ profile: any; qr: any }>(`/drivers/${id}/approve`, { method: 'POST' }),
+    reject: (id: string, reason?: string) =>
+      request<{ profile: any }>(`/drivers/${id}/reject`, { method: 'POST', body: JSON.stringify({ reason }) }),
   },
   dashboard: {
     get: () => request<unknown>('/dashboard'),
+    streamUrl: (token?: string) => `${API_BASE}/dashboard/stream${token ? `?token=${encodeURIComponent(token)}` : ''}`,
   },
   qr: {
+    verify: (taxiId: string) => request<{ taxiId: string; driver: any }>(`/qr/${taxiId}`),
     replace: () => request<{ qr: unknown }>('/qr/replace', { method: 'POST' }),
   },
   payments: {
-    initiate: (taxiId: string, farePresetId: string) =>
+    initiate: (taxiId: string, farePresetId?: string, seats: number = 1, customAmount?: number) =>
       request<{ transactionId: string; fare: { amount: number; label: string }; checkoutUrl: string }>(
-        '/payments/initiate', { method: 'POST', body: JSON.stringify({ taxiId, farePresetId }) }
+        '/payments/initiate', { method: 'POST', body: JSON.stringify({ taxiId, farePresetId, seats, customAmount }) }
       ),
+    simulateSuccess: (transactionId: string) =>
+      request<{ status: string; message: string; transaction: any }>(
+        `/payments/${transactionId}/simulate-success`, { method: 'POST' }
+      ),
+    receipt: (transactionId: string) =>
+      request<{ receipt: any }>(`/payments/${transactionId}`),
   },
 }

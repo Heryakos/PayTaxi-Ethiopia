@@ -63,6 +63,9 @@
     "subtitle": "Only your driver profile and transactions are loaded from the server.",
     "earnings": "Successful earnings",
     "payments": "Successful payments",
+    "soundbox_active": "🔊 Soundbox: Audio chime active",
+    "soundbox_muted": "🔈 Soundbox: Muted (click to enable)",
+    "payment_alert": "⚡ Received +{amount} ETB just now!",
     "no_qr": "No QR yet",
     "download_qr": "Download QR PNG",
     "report_lost": "Report lost/stolen QR",
@@ -73,6 +76,24 @@
     "sign_out": "Sign out",
     "log_out": "Log out"
   },
+  "admin": {
+    "title": "Admin Driver Verification",
+    "subtitle": "Review driver documents (National ID & License) and issue active QR codes.",
+    "all_tab": "All Applications",
+    "pending_tab": "Pending Review",
+    "approved_tab": "Approved",
+    "rejected_tab": "Rejected",
+    "approve_btn": "Approve & Issue QR",
+    "reject_btn": "Reject Application",
+    "approving": "Approving…",
+    "rejecting": "Rejecting…",
+    "no_drivers": "No driver applications found in this view.",
+    "id_document": "National ID (Kebele / Fayda)",
+    "license_document": "Driver's License",
+    "taxi_assigned": "Active Taxi ID",
+    "plate_number": "Plate Number"
+  },
+
   "home": {
     "tagline": "Verified rides. Server-checked payments.",
     "heading": "Pay your taxi fare with confidence.",

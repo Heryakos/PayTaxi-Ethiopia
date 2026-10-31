@@ -119,3 +119,64 @@ export async function getScopedDashboard(driverProfileId: string) {
 
   return { driver, qr, transactions, total, count: successful.length };
 }
+
+export async function rejectDriver(driverId: string, reason?: string) {
+  const profile = await prisma.driverProfile.update({
+    where: { id: driverId },
+    data: {
+      verificationStatus: 'REJECTED',
+    }
+  });
+
+  // Disable any active QRs for this driver
+  await prisma.taxiQr.updateMany({
+    where: { driverProfileId: driverId, status: 'ACTIVE' },
+    data: {
+      status: 'DISABLED',
+      disabledAt: new Date(),
+      disabledReason: reason || 'Application rejected by administrator'
+    }
+  });
+
+  return { profile };
+}
+
+export async function listDrivers(statusFilter?: string) {
+  const whereClause = statusFilter ? { verificationStatus: statusFilter } : {};
+  const drivers = await prisma.driverProfile.findMany({
+    where: whereClause,
+    include: {
+      user: {
+        select: {
+          id: true,
+          phone: true,
+          isVerified: true,
+          createdAt: true
+        }
+      },
+      qrs: {
+        where: { status: 'ACTIVE' },
+        take: 1
+      }
+    },
+    orderBy: { createdAt: 'desc' }
+  });
+
+  return drivers.map((d) => ({
+    id: d.id,
+    userId: d.userId,
+    phone: d.user?.phone || 'N/A',
+    displayName: d.displayName,
+    plateNumber: d.plateNumber,
+    vehicleMake: d.vehicleMake,
+    vehicleModel: d.vehicleModel,
+    vehicleColor: d.vehicleColor,
+    verificationStatus: d.verificationStatus,
+    nationalIdUrl: d.nationalIdUrl,
+    licenseUrl: d.licenseUrl,
+    activeTaxiId: d.qrs[0]?.taxiId || null,
+    rating: Number(d.rating),
+    createdAt: d.createdAt
+  }));
+}
+
