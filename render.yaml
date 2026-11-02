@@ -18,3 +18,19 @@ services:
         value: "5000"
       - key: FRONTEND_URL
         value: https://paytaxi.vercel.app
+
+  - type: web
+    name: paytaxi-web
+    runtime: node
+    region: frankfurt
+    plan: free
+    rootDir: frontend
+    buildCommand: pnpm install && pnpm build
+    startCommand: pnpm start
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://paytaxi-api.onrender.com
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
