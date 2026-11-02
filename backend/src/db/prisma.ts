@@ -6,7 +6,16 @@ import { resolve } from 'path'
 
 dotenv.config({ path: resolve(__dirname, '../.env') })
 
-const connectionString = process.env.DATABASE_URL!
+let connectionString = process.env.DATABASE_URL!
+if (connectionString && connectionString.includes('db.sklddyglnuigdnqhegck.supabase.co')) {
+  connectionString = connectionString
+    .replace('postgres:PayTaxi', 'postgres.sklddyglnuigdnqhegck:PayTaxi')
+    .replace('db.sklddyglnuigdnqhegck.supabase.co:5432', 'aws-0-eu-west-1.pooler.supabase.com:5432')
+    .replace('db.sklddyglnuigdnqhegck.supabase.co', 'aws-0-eu-west-1.pooler.supabase.com:5432')
+  if (!connectionString.includes('schema=public')) {
+    connectionString += (connectionString.includes('?') ? '&' : '?') + 'schema=public'
+  }
+}
 let _prisma: PrismaClient | null = null
 
 export async function getPrisma(): Promise<PrismaClient> {
