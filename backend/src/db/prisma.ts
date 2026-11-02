@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaMssql } from '@prisma/adapter-mssql'
+import { PrismaPg } from '@prisma/adapter-pg'
 import dotenv from 'dotenv'
 import { resolve } from 'path'
 
@@ -10,8 +11,13 @@ let _prisma: PrismaClient | null = null
 
 export async function getPrisma(): Promise<PrismaClient> {
   if (_prisma) return _prisma
-  const adapter = new PrismaMssql(connectionString)
-  _prisma = new PrismaClient({ adapter } as any)
+  if (connectionString && (connectionString.startsWith('postgresql:') || connectionString.startsWith('postgres:'))) {
+    const adapter = new PrismaPg({ connectionString })
+    _prisma = new PrismaClient({ adapter } as any)
+  } else {
+    const adapter = new PrismaMssql(connectionString)
+    _prisma = new PrismaClient({ adapter } as any)
+  }
   return _prisma
 }
 

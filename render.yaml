@@ -9,7 +9,7 @@ services:
     startCommand: node dist/index.js
     envVars:
       - key: DATABASE_URL
-        value: postgresql://postgres:PayTaxi_2026_SecureDb%21%2389@db.sklddyglnuigdnqhegck.supabase.co:5432/postgres
+        value: postgresql://postgres.sklddyglnuigdnqhegck:PayTaxi_2026_SecureDb%21%2389@aws-0-eu-west-1.pooler.supabase.com:5432/postgres?schema=public
       - key: JWT_SECRET
         generateValue: true
       - key: NODE_ENV

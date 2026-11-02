@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaMssql } from '@prisma/adapter-mssql'
+import { PrismaPg } from '@prisma/adapter-pg'
 import dotenv from 'dotenv'
 import { resolve } from 'path'
 
@@ -9,8 +10,14 @@ const connectionString = process.env.DATABASE_URL!
 
 async function main() {
   console.log('Connecting to database...')
-  const adapter = new PrismaMssql(connectionString)
-  const prisma = new PrismaClient({ adapter } as any)
+  let prisma: PrismaClient
+  if (connectionString && (connectionString.startsWith('postgresql:') || connectionString.startsWith('postgres:'))) {
+    const adapter = new PrismaPg({ connectionString })
+    prisma = new PrismaClient({ adapter } as any)
+  } else {
+    const adapter = new PrismaMssql(connectionString)
+    prisma = new PrismaClient({ adapter } as any)
+  }
 
   console.log('Seeding database...')
 
