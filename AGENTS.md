@@ -6,7 +6,13 @@
 - `/backend` — Express + Prisma API server. All business logic, auth, payments, webhooks live here.
 - `/mobile` — React Native (Expo) app. Calls `/backend` over HTTP using `lib/api.ts`. Auth via expo-secure-store + Bearer header.
 - `/packages/shared` — Shared TypeScript types (`types.ts`) and browser API client (`api-client.ts`). Cookie-based, no localStorage. **Consumed by the frontend** via `frontend/tsconfig.json` path alias `@paytaxi/shared → ../packages/shared/src` + `transpilePackages` in `frontend/next.config.mjs` (package.json `main` points at unbuilt `dist`, so always import from src through the alias). Backend does NOT import shared — it is the source of truth for `FARE_PRESETS`/`canTransition`.
-- `/docs` — `PROJECT_STATUS.md`, `ARCHITECTURE.md`.
+- `/docs` — `PROJECT_STATUS.md`, `ARCHITECTURE.md`, `PAYTAXI_MANUAL.md`, `PAYTAXI_DEPLOYMENT_AND_OPERATIONS_MANUAL.pdf`.
+
+## Live Cloud Deployments (Production)
+- **Database (Supabase PostgreSQL)**: `paytaxi-db` (Project Ref: `sklddyglnuigdnqhegck`, Region: `eu-west-1`). Pooler host: `aws-0-eu-west-1.pooler.supabase.com:5432`.
+- **Backend API (Render Web Service)**: `https://paytaxi-api.onrender.com` (Health check: `/health`, Public taxi verify: `/qr/TX-1001`).
+- **Frontend Web App (Vercel)**: `https://pay-taxi-ethiopia.vercel.app` (Next.js 16 App Router, Taxi deep link: `/t/TX-1001`).
+- **Operations & Deployment Manual**: `docs/PAYTAXI_DEPLOYMENT_AND_OPERATIONS_MANUAL.pdf` (Publication-grade PDF with embedded screenshots).
 
 ## Feature Implementation Map
 

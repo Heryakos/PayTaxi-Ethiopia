@@ -11,7 +11,7 @@ PayTaxi Ethiopia is now a production-ready, distributed mobility payments platfo
 |---|---|---|---|
 | **Database** | **Supabase (PostgreSQL)** | 🟢 **ACTIVE & SEEDED** | Project Ref: `sklddyglnuigdnqhegck` (Region: `eu-west-1`). All Prisma tables pushed and verified in cloud. |
 | **Backend API** | **Render (Web Service)** | 🟢 **LIVE IN CLOUD** | Endpoint: `https://paytaxi-api.onrender.com`. Health: `{"status":"ok"}`. Public QR: `https://paytaxi-api.onrender.com/qr/TX-1001`. |
-| **Web App** | **Vercel (Next.js 16)** | 🟢 **READY** | Monorepo root with `frontend/`. Connected to GitHub `main`. |
+| **Web App** | **Vercel (Next.js 16)** | 🟢 **LIVE IN PRODUCTION** | Live URL: `https://pay-taxi-ethiopia.vercel.app`. Deep Link: `https://pay-taxi-ethiopia.vercel.app/t/TX-1001`. Connected to Render API. |
 | **Mobile App** | **Expo / React Native (EAS)** | 🟢 **READY FOR STANDALONE APK** | Configured with `mobile/eas.json` for Android APK builds outside Wi-Fi. Points directly to Render API. |
 
 ---
