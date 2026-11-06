@@ -4,9 +4,11 @@ import { PrismaPg } from '@prisma/adapter-pg'
 import dotenv from 'dotenv'
 import { resolve } from 'path'
 
+dotenv.config({ path: resolve(__dirname, '../../.env') })
 dotenv.config({ path: resolve(__dirname, '../.env') })
+dotenv.config()
 
-let connectionString = process.env.DATABASE_URL!
+let connectionString = process.env.DATABASE_URL || ''
 if (connectionString && connectionString.includes('db.sklddyglnuigdnqhegck.supabase.co')) {
   connectionString = connectionString
     .replace('postgres:PayTaxi', 'postgres.sklddyglnuigdnqhegck:PayTaxi')
@@ -20,13 +22,17 @@ let _prisma: PrismaClient | null = null
 
 export async function getPrisma(): Promise<PrismaClient> {
   if (_prisma) return _prisma
-  if (connectionString && (connectionString.startsWith('postgresql:') || connectionString.startsWith('postgres:'))) {
-    const adapter = new PrismaPg({ connectionString })
-    _prisma = new PrismaClient({ adapter } as any)
-  } else {
-    const adapter = new PrismaMssql(connectionString)
-    _prisma = new PrismaClient({ adapter } as any)
+  if (connectionString.startsWith('sqlserver:')) {
+    try {
+      const adapter = new PrismaMssql(connectionString)
+      _prisma = new PrismaClient({ adapter } as any)
+      return _prisma
+    } catch (e) {
+      console.warn('Prisma client was generated for postgres; falling back to pg adapter.')
+    }
   }
+  const adapter = new PrismaPg({ connectionString })
+  _prisma = new PrismaClient({ adapter } as any)
   return _prisma
 }
 

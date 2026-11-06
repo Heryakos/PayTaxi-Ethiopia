@@ -1144,3 +1144,4 @@ content = content.replace(
 
 fs.writeFileSync(targetFile, content, 'utf8');
 console.log('paytaxi-app.tsx successfully updated!');
+
