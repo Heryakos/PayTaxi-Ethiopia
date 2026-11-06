@@ -15,5 +15,8 @@
       "hono": "4.12.25",
       "jest-environment-node": "30.4.1"
     }
+  },
+  "devDependencies": {
+    "puppeteer-core": "^25.16.0"
   }
 }

@@ -6,7 +6,22 @@
 - `/backend` — Express + Prisma API server. All business logic, auth, payments, webhooks live here.
 - `/mobile` — React Native (Expo) app. Calls `/backend` over HTTP using `lib/api.ts`. Auth via expo-secure-store + Bearer header.
 - `/packages/shared` — Shared TypeScript types (`types.ts`) and browser API client (`api-client.ts`). Cookie-based, no localStorage. **Consumed by the frontend** via `frontend/tsconfig.json` path alias `@paytaxi/shared → ../packages/shared/src` + `transpilePackages` in `frontend/next.config.mjs` (package.json `main` points at unbuilt `dist`, so always import from src through the alias). Backend does NOT import shared — it is the source of truth for `FARE_PRESETS`/`canTransition`.
-- `/docs` — `PROJECT_STATUS.md`, `ARCHITECTURE.md`, `PAYTAXI_MANUAL.md`, `PAYTAXI_DEPLOYMENT_AND_OPERATIONS_MANUAL.pdf`.
+- `/docs` — `PROJECT_STATUS.md`, `ARCHITECTURE.md`, `PAYTAXI_MANUAL.md`, `PAYTAXI_DEPLOYMENT_AND_OPERATIONS_MANUAL.pdf`, `PAYTAXI_PORTFOLIO_CASE_STUDY.pdf`, and `/docs/portfolio/` suite.
+
+## Portfolio Suite & Presentation Assets
+- **Location**: `docs/portfolio/`
+- **Portfolio Thumbnail / Hero Banner (1920x1080 @2x)**: `docs/portfolio/portfolio_thumbnail.png`
+- **Combined All-in-One Product Showcase**: `docs/portfolio/portfolio_combined_showcase.png`
+- **UI Screenshots (@2x Crisp Retina)**:
+  - `01_passenger_checkout.png` — Passenger minibus fare stage selector (10–50 ETB), multi-seat count, vehicle verification.
+  - `02_anti_fraud_receipt.png` — Weyala anti-fraud animated green receipt with live ticking timer, plate badge (`AA 3-B12345`), and security code.
+  - `03_driver_soundbox_dashboard.png` — Driver Soundbox hub with active audio chime indicator (587 & 880 Hz), TX-1001 QR, and earnings.
+  - `04_manager_financial_ledger.png` — Operations Manager financial hub with KPI cards (Gross volume, 2.5% platform commission, net payouts) and audit journal.
+  - `05_admin_system_settings.png` — Super Admin console with runtime In-App Live Settings (AddisPay credentials, SMS gateway selector, transit rules).
+  - `06_multimethod_auth.png` — 3-in-1 multi-method sign-in: 1-click test OTP, Driver Backup PIN (`ABCD1234`), and WhatsApp QR.
+- **Copy-Paste Portfolio Case Study**: `docs/portfolio/PORTFOLIO_CASE_STUDY.md` (Ready for portfolio websites, Behance, Notion, Framer, Webflow, GitHub).
+- **Executive PDF Case Study**: `docs/PAYTAXI_PORTFOLIO_CASE_STUDY.pdf`
+- **Asset Generator Script**: `scripts/generate_portfolio_assets.js` (Run: `node scripts/generate_portfolio_assets.js`)
 
 ## Live Cloud Deployments (Production)
 - **Database (Supabase PostgreSQL)**: `paytaxi-db` (Project Ref: `sklddyglnuigdnqhegck`, Region: `eu-west-1`). Pooler host: `aws-0-eu-west-1.pooler.supabase.com:5432`.
