@@ -178,7 +178,16 @@ async function apiFetch(path: string, options: RequestInit = {}) {
     headers,
     credentials: "include", // send the httpOnly cookie automatically
   })
-  const data = await res.json()
+  const text = await res.text()
+  let data: any
+  try {
+    data = JSON.parse(text)
+  } catch {
+    if (!res.ok) {
+      throw new Error(`API endpoint ${path} returned HTTP ${res.status}. Backend update may be in progress on Render.`)
+    }
+    throw new Error(`Invalid response format from server (${res.status})`)
+  }
   if (!res.ok) throw new Error(data.error || "Request failed")
   return data
 }
