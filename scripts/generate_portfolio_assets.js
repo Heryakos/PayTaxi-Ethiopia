@@ -11,31 +11,25 @@ if (!fs.existsSync(portfolioDir)) {
   fs.mkdirSync(portfolioDir, { recursive: true });
 }
 
-console.log('--- Starting PayTaxi Ethiopia Portfolio Asset Generation ---');
+console.log('--- Starting PayTaxi Ethiopia Complete Portfolio & Mobile Generation ---');
 
-// HTML generator for all views and portfolio presentation
 function generatePortfolioHtml() {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>PayTaxi Ethiopia Portfolio Suite</title>
+  <title>PayTaxi Ethiopia Complete Suite</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       background: #06110f;
       color: #0f172a;
       -webkit-font-smoothing: antialiased;
     }
-
     .canvas-container {
       display: flex;
       flex-direction: column;
@@ -52,7 +46,6 @@ function generatePortfolioHtml() {
       overflow: hidden;
       position: relative;
     }
-
     .brand-header {
       background: #00473e;
       color: #ffffff;
@@ -79,22 +72,7 @@ function generatePortfolioHtml() {
       letter-spacing: 0.5px;
     }
 
-    /* Screen 1: Passenger Checkout */
-    #view-passenger {
-      width: 480px;
-      background: #f8fafc;
-      border-radius: 28px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 20px 40px rgba(0, 71, 62, 0.12);
-    }
-    .taxi-profile-card {
-      background: white;
-      border-radius: 20px;
-      padding: 20px;
-      margin: 20px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    }
+    /* Ethiopian Plate Style */
     .eth-plate {
       display: inline-flex;
       align-items: center;
@@ -105,8 +83,9 @@ function generatePortfolioHtml() {
       font-family: 'JetBrains Mono', monospace;
       font-weight: 800;
       font-size: 13px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.12);
       gap: 6px;
+      color: #000;
     }
     .eth-plate .flag {
       width: 14px;
@@ -114,341 +93,124 @@ function generatePortfolioHtml() {
       background: linear-gradient(to bottom, #078930 33%, #FCDD09 33%, #FCDD09 66%, #DA121A 66%);
       border-radius: 1px;
     }
-    .preset-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 14px;
-    }
-    .preset-btn {
-      background: #f1f5f9;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 12px;
-      padding: 12px 8px;
-      text-align: center;
-      font-weight: 700;
-      font-size: 15px;
-      color: #1e293b;
-      cursor: pointer;
-    }
-    .preset-btn.active {
-      background: #00473e;
-      color: #ffffff;
-      border-color: #00473e;
-      box-shadow: 0 4px 12px rgba(0, 71, 62, 0.25);
-    }
-    .seat-counter {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 10px 16px;
-      margin-top: 14px;
-    }
-    .counter-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      background: white;
-      border: 1px solid #cbd5e1;
-      font-size: 18px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .btn-pay {
-      background: linear-gradient(135deg, #00473e, #036254);
-      color: white;
-      width: 100%;
-      padding: 16px;
-      border-radius: 16px;
-      border: none;
-      font-size: 17px;
-      font-weight: 700;
-      margin-top: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 10px 20px rgba(0, 71, 62, 0.3);
-    }
 
-    /* Screen 2: Anti-Fraud Weyala Receipt */
-    #view-receipt {
-      width: 480px;
-      background: #061e19;
-      border-radius: 28px;
-      border: 2px solid #00a878;
-      box-shadow: 0 0 50px rgba(0, 168, 120, 0.25);
-      color: white;
-      overflow: hidden;
+    /* Web Views */
+    #view-passenger { width: 480px; background: #f8fafc; border-radius: 28px; border: 1px solid #e2e8f0; }
+    .taxi-profile-card { background: white; border-radius: 20px; padding: 20px; margin: 20px; border: 1px solid #e2e8f0; }
+    .preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+    .preset-btn { background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 12px 8px; text-align: center; font-weight: 700; font-size: 15px; color: #1e293b; }
+    .preset-btn.active { background: #00473e; color: #ffffff; border-color: #00473e; box-shadow: 0 4px 12px rgba(0, 71, 62, 0.25); }
+    .seat-counter { display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 10px 16px; margin-top: 14px; }
+    .counter-btn { width: 36px; height: 36px; border-radius: 10px; background: white; border: 1px solid #cbd5e1; font-size: 18px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .btn-pay { background: linear-gradient(135deg, #00473e, #036254); color: white; width: 100%; padding: 16px; border-radius: 16px; border: none; font-size: 17px; font-weight: 700; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 10px 20px rgba(0, 71, 62, 0.3); }
+
+    #view-receipt { width: 480px; background: #061e19; border-radius: 28px; border: 2px solid #00a878; box-shadow: 0 0 50px rgba(0, 168, 120, 0.25); color: white; overflow: hidden; position: relative; }
+    .receipt-header-glow { background: linear-gradient(180deg, rgba(0, 168, 120, 0.2) 0%, transparent 100%); padding: 30px 24px 10px 24px; text-align: center; }
+    .check-circle { width: 68px; height: 68px; background: #00a878; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; box-shadow: 0 0 30px #00a878; }
+    .receipt-amount { font-size: 44px; font-weight: 800; color: #ffffff; letter-spacing: -1px; }
+    .receipt-body { padding: 20px 24px; }
+    .receipt-meta-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
+    .meta-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    .meta-row:last-child { border-bottom: none; }
+    .live-timer-badge { background: rgba(0, 168, 120, 0.15); border: 1px solid #00a878; color: #4ade80; padding: 8px 14px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 14px; }
+    .pulse-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80; }
+    .security-hash { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #94a3b8; text-align: center; margin-top: 14px; letter-spacing: 1px; }
+
+    #view-driver { width: 900px; background: white; border-radius: 28px; border: 1px solid #e2e8f0; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08); overflow: hidden; }
+    .soundbox-banner { background: linear-gradient(135deg, #00473e, #022c26); color: white; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; }
+    .audio-visualizer { display: flex; align-items: center; gap: 4px; height: 24px; }
+    .bar { width: 4px; background: #4ade80; border-radius: 2px; }
+    .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 24px 32px; }
+    .kpi-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 18px; padding: 20px; }
+    .kpi-value { font-size: 28px; font-weight: 800; color: #0f172a; margin-top: 6px; }
+
+    #view-manager { width: 1080px; background: white; border-radius: 28px; border: 1px solid #e2e8f0; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08); overflow: hidden; }
+    .manager-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 24px 32px; }
+    .table-container { padding: 0 32px 32px 32px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    th { background: #f1f5f9; color: #475569; text-align: left; padding: 12px 14px; font-weight: 700; border-bottom: 2px solid #e2e8f0; }
+    td { padding: 14px 14px; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
+    .badge-success { background: #dcfce7; color: #15803d; font-weight: 700; font-size: 11px; padding: 4px 10px; border-radius: 20px; display: inline-block; }
+
+    #view-admin { width: 1040px; background: white; border-radius: 28px; border: 1px solid #e2e8f0; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08); overflow: hidden; }
+    .admin-nav { background: #0f172a; color: white; display: flex; padding: 0 32px; gap: 24px; }
+    .admin-nav-item { padding: 18px 0; font-weight: 600; font-size: 14px; color: #94a3b8; border-bottom: 3px solid transparent; }
+    .admin-nav-item.active { color: #38bdf8; border-bottom-color: #38bdf8; }
+    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 32px; }
+    .setting-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 18px; padding: 24px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 12.5px; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-input { width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid #cbd5e1; background: white; font-size: 14px; font-family: inherit; }
+
+    #view-auth { width: 480px; background: white; border-radius: 28px; border: 1px solid #e2e8f0; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); overflow: hidden; padding: 32px; }
+    .auth-tabs { display: flex; background: #f1f5f9; border-radius: 14px; padding: 4px; margin-bottom: 24px; }
+    .auth-tab { flex: 1; padding: 10px 8px; text-align: center; font-size: 12.5px; font-weight: 700; color: #64748b; border-radius: 10px; }
+    .auth-tab.active { background: white; color: #0f172a; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+
+    /* Smartphone Device Mockups */
+    .phone-device {
+      width: 390px;
+      height: 800px;
+      background: #000;
+      border: 11px solid #1e293b;
+      border-radius: 52px;
+      box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.15);
       position: relative;
-    }
-    .receipt-header-glow {
-      background: linear-gradient(180deg, rgba(0, 168, 120, 0.2) 0%, transparent 100%);
-      padding: 30px 24px 10px 24px;
-      text-align: center;
-    }
-    .check-circle {
-      width: 68px;
-      height: 68px;
-      background: #00a878;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 16px auto;
-      box-shadow: 0 0 30px #00a878;
-    }
-    .receipt-amount {
-      font-size: 44px;
-      font-weight: 800;
-      color: #ffffff;
-      letter-spacing: -1px;
-    }
-    .receipt-body {
-      padding: 20px 24px;
-    }
-    .receipt-meta-box {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 18px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-    .meta-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      font-size: 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    .meta-row:last-child {
-      border-bottom: none;
-    }
-    .live-timer-badge {
-      background: rgba(0, 168, 120, 0.15);
-      border: 1px solid #00a878;
-      color: #4ade80;
-      padding: 8px 14px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 700;
-      font-size: 14px;
-    }
-    .pulse-dot {
-      width: 8px;
-      height: 8px;
-      background: #4ade80;
-      border-radius: 50%;
-      box-shadow: 0 0 8px #4ade80;
-    }
-    .security-hash {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: #94a3b8;
-      text-align: center;
-      margin-top: 14px;
-      letter-spacing: 1px;
-    }
-
-    /* Screen 3: Driver Soundbox Dashboard */
-    #view-driver {
-      width: 900px;
-      background: white;
-      border-radius: 28px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
       overflow: hidden;
-    }
-    .soundbox-banner {
-      background: linear-gradient(135deg, #00473e, #022c26);
-      color: white;
-      padding: 24px 32px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
     }
-    .audio-visualizer {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      height: 24px;
-    }
-    .bar {
-      width: 4px;
-      background: #4ade80;
-      border-radius: 2px;
-    }
-    .kpi-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      padding: 24px 32px;
-    }
-    .kpi-card {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 18px;
-      padding: 20px;
-    }
-    .kpi-value {
-      font-size: 28px;
-      font-weight: 800;
-      color: #0f172a;
-      margin-top: 6px;
-    }
-
-    /* Screen 4: Operations Manager Ledger */
-    #view-manager {
-      width: 1080px;
-      background: white;
-      border-radius: 28px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-    }
-    .manager-kpis {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      padding: 24px 32px;
-    }
-    .table-container {
-      padding: 0 32px 32px 32px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13.5px;
-    }
-    th {
-      background: #f1f5f9;
-      color: #475569;
-      text-align: left;
-      padding: 12px 14px;
-      font-weight: 700;
-      border-bottom: 2px solid #e2e8f0;
-    }
-    td {
-      padding: 14px 14px;
-      border-bottom: 1px solid #f1f5f9;
-      color: #1e293b;
-    }
-    .badge-success {
-      background: #dcfce7;
-      color: #15803d;
-      font-weight: 700;
-      font-size: 11px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      display: inline-block;
-    }
-
-    /* Screen 5: Admin Live System Settings */
-    #view-admin {
-      width: 1040px;
-      background: white;
-      border-radius: 28px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-    }
-    .admin-nav {
-      background: #0f172a;
-      color: white;
-      display: flex;
-      padding: 0 32px;
-      gap: 24px;
-    }
-    .admin-nav-item {
-      padding: 18px 0;
-      font-weight: 600;
-      font-size: 14px;
-      color: #94a3b8;
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-    }
-    .admin-nav-item.active {
-      color: #38bdf8;
-      border-bottom-color: #38bdf8;
-    }
-    .settings-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      padding: 32px;
-    }
-    .setting-card {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 18px;
-      padding: 24px;
-    }
-    .form-group {
-      margin-bottom: 16px;
-    }
-    .form-label {
-      display: block;
-      font-size: 12.5px;
-      font-weight: 700;
-      color: #475569;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .form-input {
-      width: 100%;
-      padding: 10px 14px;
-      border-radius: 10px;
-      border: 1px solid #cbd5e1;
-      background: white;
-      font-size: 14px;
-      font-family: inherit;
-    }
-
-    /* Screen 6: Multi-Method Auth */
-    #view-auth {
-      width: 480px;
-      background: white;
-      border-radius: 28px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-      padding: 32px;
-    }
-    .auth-tabs {
-      display: flex;
-      background: #f1f5f9;
+    .phone-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 114px;
+      height: 26px;
+      background: #000;
       border-radius: 14px;
-      padding: 4px;
-      margin-bottom: 24px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 8px;
     }
-    .auth-tab {
-      flex: 1;
-      padding: 10px 8px;
-      text-align: center;
-      font-size: 12.5px;
-      font-weight: 700;
-      color: #64748b;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    .auth-tab.active {
-      background: white;
-      color: #0f172a;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-    }
+    .camera-lens { width: 10px; height: 10px; background: #082f49; border-radius: 50%; box-shadow: inset 0 0 2px #38bdf8; }
+    .phone-status-bar { height: 44px; padding: 10px 22px 0 22px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700; z-index: 90; }
+    .phone-status-bar.dark { color: white; }
+    .phone-status-bar.light { color: #0f172a; }
+    .phone-home-indicator { width: 130px; height: 4px; background: #94a3b8; border-radius: 2px; margin: 8px auto; z-index: 90; }
 
-    /* Presentation Banner 1920x1080 */
+    /* Dual Platform 1920x1080 */
+    #view-dual-platform {
+      width: 1920px;
+      height: 1080px;
+      background: radial-gradient(circle at 70% 30%, #00473e 0%, #041f1a 50%, #020908 100%);
+      color: white;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 60px 80px;
+    }
+    .laptop-frame {
+      width: 1060px;
+      height: 680px;
+      background: #0f172a;
+      border-radius: 18px 18px 0 0;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 35px 80px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .browser-header { background: #1e293b; padding: 12px 18px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    .browser-dots { display: flex; gap: 6px; }
+    .browser-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .browser-address { flex: 1; background: #0f172a; border-radius: 8px; padding: 6px 14px; font-size: 12px; color: #94a3b8; font-family: 'JetBrains Mono', monospace; display: flex; align-items: center; gap: 8px; }
+
+    /* Thumbnail 1920x1080 */
     #view-thumbnail {
       width: 1920px;
       height: 1080px;
@@ -459,30 +221,12 @@ function generatePortfolioHtml() {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 80px 100px;
+      padding: 70px 90px;
     }
-    .hero-glow-1 {
-      position: absolute;
-      top: -100px;
-      right: 100px;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(0, 168, 120, 0.25) 0%, transparent 70%);
-      filter: blur(60px);
-      pointer-events: none;
-    }
-    .hero-glow-2 {
-      position: absolute;
-      bottom: -150px;
-      left: 100px;
-      width: 700px;
-      height: 700px;
-      background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 70%);
-      filter: blur(80px);
-      pointer-events: none;
-    }
+    .hero-glow-1 { position: absolute; top: -100px; right: 100px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0, 168, 120, 0.25) 0%, transparent 70%); filter: blur(60px); pointer-events: none; }
+    .hero-glow-2 { position: absolute; bottom: -150px; left: 100px; width: 700px; height: 700px; background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 70%); filter: blur(80px); pointer-events: none; }
 
-    /* All-In-One Showcase (2000x1250) */
+    /* Combined 2000x1250 */
     #view-combined {
       width: 2000px;
       height: 1250px;
@@ -490,7 +234,7 @@ function generatePortfolioHtml() {
       color: white;
       position: relative;
       overflow: hidden;
-      padding: 60px 80px;
+      padding: 50px 70px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -501,19 +245,15 @@ function generatePortfolioHtml() {
 
   <div class="canvas-container">
 
-    <!-- SCREEN 1: PASSENGER CHECKOUT -->
+    <!-- 01. PASSENGER CHECKOUT (WEB) -->
     <div id="view-passenger" class="screen-frame">
       <div class="brand-header">
         <div class="brand-logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <rect x="2" y="5" width="20" height="14" rx="3" />
-            <line x1="2" y1="10" x2="22" y2="10" />
-          </svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="3"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
           PAYTAXI ETHIOPIA
         </div>
         <span class="logo-badge">PASSENGER</span>
       </div>
-
       <div class="taxi-profile-card">
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
           <div>
@@ -529,9 +269,8 @@ function generatePortfolioHtml() {
             <span>AA 3-B12345</span>
           </div>
         </div>
-
         <div style="margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
-          <div style="font-size: 13px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Select Minibus Stage Fare</div>
+          <div style="font-size: 13px; font-weight: 700; color: #475569; text-transform: uppercase;">Select Minibus Stage Fare</div>
           <div class="preset-grid">
             <div class="preset-btn">10 ETB</div>
             <div class="preset-btn">15 ETB</div>
@@ -541,7 +280,6 @@ function generatePortfolioHtml() {
             <div class="preset-btn">50 ETB</div>
           </div>
         </div>
-
         <div class="seat-counter">
           <div>
             <div style="font-size: 14px; font-weight: 700; color: #0f172a;">Number of Seats</div>
@@ -553,91 +291,51 @@ function generatePortfolioHtml() {
             <div class="counter-btn">+</div>
           </div>
         </div>
-
         <div style="margin-top: 20px; background: #f8fafc; border-radius: 14px; padding: 14px; display: flex; justify-content: space-between; align-items: center;">
           <span style="font-size: 15px; font-weight: 600; color: #475569;">Total Amount Due:</span>
           <span style="font-size: 24px; font-weight: 800; color: #00473e;">50.00 ETB</span>
         </div>
-
-        <button class="btn-pay">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-          </svg>
-          Pay 50.00 ETB with AddisPay
-        </button>
-
-        <div style="text-align: center; margin-top: 14px; font-size: 12px; color: #94a3b8; display: flex; align-items: center; justify-content: center; gap: 6px;">
-          <span>🔒 Secured via AddisPay Ethiopia (Telebirr & CBE)</span>
-        </div>
+        <button class="btn-pay">Pay 50.00 ETB with AddisPay</button>
+        <div style="text-align: center; margin-top: 14px; font-size: 12px; color: #94a3b8;">🔒 Secured via AddisPay Ethiopia (Telebirr & CBE)</div>
       </div>
     </div>
 
-
-    <!-- SCREEN 2: ANTI-FRAUD WEYALA RECEIPT -->
+    <!-- 02. WEYALA ANTI-FRAUD RECEIPT (WEB) -->
     <div id="view-receipt" class="screen-frame">
       <div class="receipt-header-glow">
         <div class="check-circle">
-          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
         </div>
         <div style="font-size: 13px; font-weight: 800; letter-spacing: 1.5px; color: #4ade80; text-transform: uppercase;">Payment Confirmed</div>
         <div class="receipt-amount">50.00 <span style="font-size: 22px; font-weight: 600; color: #a7f3d0;">ETB</span></div>
         <div style="font-size: 14px; color: #94a3b8; margin-top: 4px;">2 Seats &bull; Minibus Fare (Stage 4)</div>
       </div>
-
       <div class="receipt-body">
         <div class="live-timer-badge">
           <div class="pulse-dot"></div>
           <span>WEYALA VERIFICATION ACTIVE: 09:48 REMAINING</span>
         </div>
-
         <div class="receipt-meta-box" style="margin-top: 16px;">
           <div class="meta-row">
             <span style="color: #94a3b8;">Vehicle Plate</span>
-            <div class="eth-plate" style="border: 1px solid #e2e8f0;">
-              <span class="flag"></span>
-              <span style="color: #0f172a;">AA 3-B12345</span>
-            </div>
+            <div class="eth-plate" style="border: 1px solid #e2e8f0;"><span class="flag"></span><span>AA 3-B12345</span></div>
           </div>
-          <div class="meta-row">
-            <span style="color: #94a3b8;">Taxi ID</span>
-            <span style="font-weight: 700; color: white;">TX-1001</span>
-          </div>
-          <div class="meta-row">
-            <span style="color: #94a3b8;">Driver</span>
-            <span style="font-weight: 700; color: white;">Abebe Bikila</span>
-          </div>
-          <div class="meta-row">
-            <span style="color: #94a3b8;">Timestamp</span>
-            <span style="color: #cbd5e1; font-family: 'JetBrains Mono', monospace; font-size: 13px;">06 Nov 2026, 16:42:10</span>
-          </div>
-          <div class="meta-row">
-            <span style="color: #94a3b8;">AddisPay Reference</span>
-            <span style="color: #4ade80; font-family: 'JetBrains Mono', monospace; font-size: 12px;">TXN-AP-992184</span>
-          </div>
+          <div class="meta-row"><span style="color: #94a3b8;">Taxi ID</span><span style="font-weight: 700; color: white;">TX-1001</span></div>
+          <div class="meta-row"><span style="color: #94a3b8;">Driver</span><span style="font-weight: 700; color: white;">Abebe Bikila</span></div>
+          <div class="meta-row"><span style="color: #94a3b8;">AddisPay Reference</span><span style="color: #4ade80; font-family: 'JetBrains Mono', monospace; font-size: 12px;">TXN-AP-992184</span></div>
         </div>
-
         <div style="background: rgba(0, 168, 120, 0.1); border: 1px dashed rgba(0, 168, 120, 0.4); border-radius: 14px; padding: 12px; text-align: center;">
           <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #86efac; font-weight: 700;">Anti-Fraud Dynamic Security Seal</div>
           <div class="security-hash">TOKEN: 4F9B-782A-C011 &bull; SOUNDBOX SYNCED</div>
         </div>
-
-        <div style="text-align: center; margin-top: 16px; font-size: 12px; color: #64748b;">
-          Show this screen to the Weyala (Conductor) upon entering or exiting.
-        </div>
       </div>
     </div>
 
-
-    <!-- SCREEN 3: DRIVER SOUNDBOX DASHBOARD -->
+    <!-- 03. DRIVER SOUNDBOX DASHBOARD (WEB) -->
     <div id="view-driver" class="screen-frame">
       <div class="brand-header">
         <div class="brand-logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <rect x="2" y="5" width="20" height="14" rx="3" />
-            <line x1="2" y1="10" x2="22" y2="10" />
-          </svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="3"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
           PAYTAXI DRIVER PORTAL
         </div>
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -645,12 +343,11 @@ function generatePortfolioHtml() {
           <span class="logo-badge" style="background: #4ade80; color: #022c26;">ONLINE</span>
         </div>
       </div>
-
       <div class="soundbox-banner">
         <div>
           <div style="display: flex; align-items: center; gap: 10px;">
             <div style="width: 12px; height: 12px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 12px #4ade80;"></div>
-            <span style="font-size: 18px; font-weight: 800; letter-spacing: -0.3px;">Real-Time Soundbox Active</span>
+            <span style="font-size: 18px; font-weight: 800;">Real-Time Soundbox Active</span>
           </div>
           <div style="font-size: 13px; color: #a7f3d0; margin-top: 4px;">Web Audio 587Hz/880Hz chime + Ethiopian voice synthesis live on incoming payments</div>
         </div>
@@ -663,7 +360,6 @@ function generatePortfolioHtml() {
           <div class="bar" style="height: 8px;"></div>
         </div>
       </div>
-
       <div class="kpi-row">
         <div class="kpi-card">
           <div style="font-size: 12.5px; font-weight: 700; color: #64748b; text-transform: uppercase;">Today's Revenue</div>
@@ -681,78 +377,17 @@ function generatePortfolioHtml() {
           <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Offline SMS fallback code</div>
         </div>
       </div>
-
-      <div style="padding: 0 32px 32px 32px; display: grid; grid-template-columns: 300px 1fr; gap: 24px;">
-        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 20px; text-align: center;">
-          <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Active Passenger QR Code</div>
-          <div style="background: white; padding: 14px; border-radius: 14px; display: inline-block; border: 1px solid #cbd5e1; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-            <!-- High quality QR SVG representation -->
-            <svg width="150" height="150" viewBox="0 0 100 100" fill="#00473e">
-              <rect x="10" y="10" width="25" height="25" fill="#00473e" />
-              <rect x="15" y="15" width="15" height="15" fill="#ffffff" />
-              <rect x="18" y="18" width="9" height="9" fill="#00473e" />
-              <rect x="65" y="10" width="25" height="25" fill="#00473e" />
-              <rect x="70" y="15" width="15" height="15" fill="#ffffff" />
-              <rect x="73" y="18" width="9" height="9" fill="#00473e" />
-              <rect x="10" y="65" width="25" height="25" fill="#00473e" />
-              <rect x="15" y="70" width="15" height="15" fill="#ffffff" />
-              <rect x="18" y="73" width="9" height="9" fill="#00473e" />
-              <rect x="45" y="15" width="10" height="20" />
-              <rect x="40" y="45" width="20" height="10" />
-              <rect x="65" y="45" width="25" height="10" />
-              <rect x="45" y="65" width="10" height="25" />
-              <rect x="65" y="70" width="20" height="20" />
-            </svg>
-          </div>
-          <div style="font-size: 13px; font-weight: 700; color: #00473e; margin-top: 10px;">TX-1001 &bull; Print & Display</div>
-        </div>
-
-        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 20px;">
-          <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 12px; display: flex; justify-content: space-between;">
-            <span>Recent Payment Announcements</span>
-            <span style="font-size: 12px; color: #16a34a; font-weight: 600;">● Live Stream Connected</span>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 10px;">
-            <div style="background: white; border: 1px solid #e2e8f0; border-left: 4px solid #16a34a; border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <div style="font-weight: 700; font-size: 14px; color: #0f172a;">Payment Received &bull; 2 Seats</div>
-                <div style="font-size: 12px; color: #64748b;">AddisPay / Telebirr &bull; Just now</div>
-              </div>
-              <div style="font-weight: 800; font-size: 16px; color: #16a34a;">+50.00 ETB</div>
-            </div>
-            <div style="background: white; border: 1px solid #e2e8f0; border-left: 4px solid #16a34a; border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <div style="font-weight: 700; font-size: 14px; color: #0f172a;">Payment Received &bull; 1 Seat</div>
-                <div style="font-size: 12px; color: #64748b;">AddisPay / CBE Birr &bull; 4 mins ago</div>
-              </div>
-              <div style="font-weight: 800; font-size: 16px; color: #16a34a;">+25.00 ETB</div>
-            </div>
-            <div style="background: white; border: 1px solid #e2e8f0; border-left: 4px solid #16a34a; border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <div style="font-weight: 700; font-size: 14px; color: #0f172a;">Payment Received &bull; 1 Seat</div>
-                <div style="font-size: 12px; color: #64748b;">AddisPay / Telebirr &bull; 12 mins ago</div>
-              </div>
-              <div style="font-weight: 800; font-size: 16px; color: #16a34a;">+35.00 ETB</div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
-
-    <!-- SCREEN 4: OPERATIONS MANAGER FINANCIAL LEDGER -->
+    <!-- 04. OPERATIONS MANAGER LEDGER (WEB) -->
     <div id="view-manager" class="screen-frame">
       <div class="brand-header">
         <div class="brand-logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="12" y1="1" x2="12" y2="23"/>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-          </svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           PAYTAXI OPERATIONS & FINANCIAL LEDGER
         </div>
         <span class="logo-badge" style="background: #38bdf8; color: #082f49;">OPERATIONS MANAGER</span>
       </div>
-
       <div class="manager-kpis">
         <div class="kpi-card">
           <div style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">Gross Transit Volume</div>
@@ -767,7 +402,7 @@ function generatePortfolioHtml() {
         <div class="kpi-card">
           <div style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">Driver Net Payouts (97.5%)</div>
           <div class="kpi-value" style="color: #166534;">144,933.75 <span style="font-size: 15px;">ETB</span></div>
-          <div style="font-size: 11.5px; color: #16a34a; font-weight: 600; margin-top: 4px;">Scheduled for bank settlement</div>
+          <div style="font-size: 11.5px; color: #16a34a; font-weight: 600; margin-top: 4px;">Settled to commercial accounts</div>
         </div>
         <div class="kpi-card">
           <div style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">Success Rate</div>
@@ -775,407 +410,605 @@ function generatePortfolioHtml() {
           <div style="font-size: 11.5px; color: #64748b; margin-top: 4px;">Zero duplicate webhooks</div>
         </div>
       </div>
-
-      <div class="table-container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <div style="font-weight: 800; font-size: 16px; color: #0f172a;">Real-Time Financial Settlement Journal</div>
-          <div style="display: flex; gap: 10px;">
-            <input type="text" placeholder="Search Taxi ID or Plate..." style="padding: 8px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; width: 220px;" value="TX-1001" readonly>
-            <span style="background: #e2e8f0; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #475569;">Status: All</span>
-          </div>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>Taxi & Driver</th>
-              <th>Plate</th>
-              <th>Seats</th>
-              <th>Gross Amount</th>
-              <th>Fee (2.5%)</th>
-              <th>Driver Payout</th>
-              <th>Provider Ref</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style="font-family: 'JetBrains Mono', monospace; font-size: 12px;">16:42:10</td>
-              <td><strong>TX-1001</strong> &bull; Abebe B.</td>
-              <td><span class="eth-plate" style="font-size: 11px; padding: 2px 4px;"><span class="flag"></span>AA 3-B12345</span></td>
-              <td>2</td>
-              <td style="font-weight: 700;">50.00 ETB</td>
-              <td style="color: #64748b;">1.25 ETB</td>
-              <td style="font-weight: 700; color: #166534;">48.75 ETB</td>
-              <td style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #64748b;">TXN-AP-992184</td>
-              <td><span class="badge-success">● SETTLED</span></td>
-            </tr>
-            <tr>
-              <td style="font-family: 'JetBrains Mono', monospace; font-size: 12px;">16:38:05</td>
-              <td><strong>TX-1001</strong> &bull; Abebe B.</td>
-              <td><span class="eth-plate" style="font-size: 11px; padding: 2px 4px;"><span class="flag"></span>AA 3-B12345</span></td>
-              <td>1</td>
-              <td style="font-weight: 700;">25.00 ETB</td>
-              <td style="color: #64748b;">0.63 ETB</td>
-              <td style="font-weight: 700; color: #166534;">24.37 ETB</td>
-              <td style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #64748b;">TXN-AP-992181</td>
-              <td><span class="badge-success">● SETTLED</span></td>
-            </tr>
-            <tr>
-              <td style="font-family: 'JetBrains Mono', monospace; font-size: 12px;">16:30:12</td>
-              <td><strong>TX-1001</strong> &bull; Abebe B.</td>
-              <td><span class="eth-plate" style="font-size: 11px; padding: 2px 4px;"><span class="flag"></span>AA 3-B12345</span></td>
-              <td>1</td>
-              <td style="font-weight: 700;">35.00 ETB</td>
-              <td style="color: #64748b;">0.88 ETB</td>
-              <td style="font-weight: 700; color: #166534;">34.12 ETB</td>
-              <td style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #64748b;">TXN-AP-992176</td>
-              <td><span class="badge-success">● SETTLED</span></td>
-            </tr>
-            <tr>
-              <td style="font-family: 'JetBrains Mono', monospace; font-size: 12px;">16:21:44</td>
-              <td><strong>TX-1004</strong> &bull; Mulugeta K.</td>
-              <td><span class="eth-plate" style="font-size: 11px; padding: 2px 4px;"><span class="flag"></span>AA 3-C99812</span></td>
-              <td>3</td>
-              <td style="font-weight: 700;">75.00 ETB</td>
-              <td style="color: #64748b;">1.88 ETB</td>
-              <td style="font-weight: 700; color: #166534;">73.12 ETB</td>
-              <td style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #64748b;">TXN-AP-992170</td>
-              <td><span class="badge-success">● SETTLED</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
 
-
-    <!-- SCREEN 5: ADMIN LIVE SYSTEM SETTINGS -->
+    <!-- 05. ADMIN LIVE SYSTEM SETTINGS (WEB) -->
     <div id="view-admin" class="screen-frame">
       <div class="brand-header">
         <div class="brand-logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M12 2a10 10 0 1 0 10 10H12V2z"/>
-          </svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/></svg>
           PAYTAXI ROOT CONTROL CONSOLE
         </div>
         <span class="logo-badge" style="background: #ef4444; color: white;">SUPER ADMIN</span>
       </div>
-
       <div class="admin-nav">
-        <div class="admin-nav-item">KYC Driver Verification (3 Pending)</div>
+        <div class="admin-nav-item">KYC Driver Verification</div>
         <div class="admin-nav-item">User & Staff Roles</div>
         <div class="admin-nav-item active">Live System Settings (No Code)</div>
-        <div class="admin-nav-item">Financial Ledger</div>
       </div>
-
       <div class="settings-grid">
         <div class="setting-card">
           <div style="font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">AddisPay Payment Gateway</div>
-          <div style="font-size: 12.5px; color: #64748b; margin-bottom: 18px;">Update production credentials without server restarts</div>
-
-          <div class="form-group">
-            <label class="form-label">Gateway Base URL</label>
-            <input class="form-input" value="https://api.addispay.et/v1" readonly>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Client App ID</label>
-            <input class="form-input" value="PAYTAXI_ETH_LIVE_902184" readonly>
-          </div>
-          <div class="form-group">
-            <label class="form-label">AddisPay Webhook Secret Key</label>
-            <input class="form-input" value="••••••••••••••••••••••••••••••••" readonly>
-          </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 8px;">
-            <span style="font-size: 13.5px; font-weight: 600; color: #0f172a;">Sandbox Simulation Mode</span>
-            <span style="background: #dcfce7; color: #166534; font-weight: 800; font-size: 12px; padding: 4px 12px; border-radius: 20px;">ACTIVE (SAFE)</span>
-          </div>
+          <div class="form-group" style="margin-top: 14px;"><label class="form-label">Gateway Base URL</label><input class="form-input" value="https://api.addispay.et/v1" readonly></div>
+          <div class="form-group"><label class="form-label">Client App ID</label><input class="form-input" value="PAYTAXI_ETH_LIVE_902184" readonly></div>
         </div>
-
         <div class="setting-card">
-          <div style="font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Transit Fare & Commission Rules</div>
-          <div style="font-size: 12.5px; color: #64748b; margin-bottom: 18px;">Regulate city minibus tariffs and automated margins</div>
-
-          <div class="form-group">
-            <label class="form-label">Platform Service Commission (%)</label>
-            <input class="form-input" value="2.5%" readonly>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Minibus Stage Fare Presets (ETB)</label>
-            <input class="form-input" value="10, 15, 20, 25, 35, 50" readonly>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Active SMS OTP Gateway</label>
-            <input class="form-input" value="Free Sandbox (Instant Test & Development)" readonly>
-          </div>
-          <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
-            <button style="background: #00473e; color: white; border: none; padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer;">
-              Save Live Configuration
-            </button>
-          </div>
+          <div style="font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Transit Commission & Fare Rules</div>
+          <div class="form-group" style="margin-top: 14px;"><label class="form-label">Platform Fee (%)</label><input class="form-input" value="2.5%" readonly></div>
+          <div class="form-group"><label class="form-label">SMS Gateway</label><input class="form-input" value="Free Sandbox (Instant Test & Dev)" readonly></div>
         </div>
       </div>
     </div>
 
-
-    <!-- SCREEN 6: MULTI-METHOD AUTHENTICATION -->
+    <!-- 06. MULTI-METHOD AUTH (WEB) -->
     <div id="view-auth" class="screen-frame">
       <div style="text-align: center; margin-bottom: 20px;">
         <div style="width: 52px; height: 52px; background: #00473e; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; color: white;">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <rect x="5" y="2" width="14" height="20" rx="3" />
-            <line x1="12" y1="18" x2="12" y2="18.01" />
-          </svg>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="2" width="14" height="20" rx="3"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg>
         </div>
         <div style="font-size: 22px; font-weight: 800; color: #0f172a;">Sign in to PayTaxi</div>
-        <div style="font-size: 13.5px; color: #64748b; margin-top: 4px;">Universal access for Drivers, Managers & Staff</div>
       </div>
-
       <div class="auth-tabs">
         <div class="auth-tab active">Phone OTP</div>
         <div class="auth-tab">Driver Backup PIN</div>
         <div class="auth-tab">QR Login</div>
       </div>
-
       <div class="form-group">
         <label class="form-label">Ethiopian Mobile Number</label>
         <input class="form-input" value="+251 92 222 2222" readonly style="font-weight: 600;">
       </div>
-
-      <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 12px; margin-bottom: 16px;">
-        <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #065f46; letter-spacing: 0.5px;">Testing Mode Active</div>
-        <div style="font-size: 13px; font-weight: 700; color: #047857; margin-top: 2px;">⚡ 1-Click Auto-Fill & Instant Sign In</div>
+      <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 10px; margin-bottom: 14px; font-size: 12px; font-weight: 700; color: #047857;">
+        ⚡ 1-Click Auto-Fill & Instant Sign In
       </div>
-
-      <div class="form-group">
-        <label class="form-label">6-Digit Verification Code</label>
-        <div style="display: flex; gap: 8px;">
-          <input style="flex: 1; height: 48px; border: 1.5px solid #00473e; border-radius: 10px; text-align: center; font-size: 20px; font-weight: 800; font-family: 'JetBrains Mono', monospace;" value="8" readonly>
-          <input style="flex: 1; height: 48px; border: 1.5px solid #00473e; border-radius: 10px; text-align: center; font-size: 20px; font-weight: 800; font-family: 'JetBrains Mono', monospace;" value="8" readonly>
-          <input style="flex: 1; height: 48px; border: 1.5px solid #00473e; border-radius: 10px; text-align: center; font-size: 20px; font-weight: 800; font-family: 'JetBrains Mono', monospace;" value="1" readonly>
-          <input style="flex: 1; height: 48px; border: 1.5px solid #00473e; border-radius: 10px; text-align: center; font-size: 20px; font-weight: 800; font-family: 'JetBrains Mono', monospace;" value="8" readonly>
-          <input style="flex: 1; height: 48px; border: 1.5px solid #00473e; border-radius: 10px; text-align: center; font-size: 20px; font-weight: 800; font-family: 'JetBrains Mono', monospace;" value="0" readonly>
-          <input style="flex: 1; height: 48px; border: 1.5px solid #00473e; border-radius: 10px; text-align: center; font-size: 20px; font-weight: 800; font-family: 'JetBrains Mono', monospace;" value="4" readonly>
-        </div>
-      </div>
-
-      <button style="width: 100%; background: #00473e; color: white; border: none; padding: 14px; border-radius: 14px; font-weight: 700; font-size: 15px; margin-top: 10px;">
-        Verify and Continue
-      </button>
-
-      <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #f1f5f9; text-align: center; font-size: 12px; color: #64748b;">
-        SMS network outage? Switch to <strong>Driver Backup PIN</strong> or <strong>WhatsApp QR</strong>.
-      </div>
+      <button style="width: 100%; background: #00473e; color: white; border: none; padding: 14px; border-radius: 14px; font-weight: 700;">Verify and Continue</button>
     </div>
 
+    <!-- ============================================================== -->
+    <!-- MOBILE PHONE 1: PASSENGER CHECKOUT (ON SMARTPHONE)             -->
+    <!-- ============================================================== -->
+    <div id="phone-passenger" class="phone-device">
+      <div class="phone-island"><div class="camera-lens"></div></div>
+      <div class="phone-status-bar light" style="background: #00473e; color: white;">
+        <span>09:41</span>
+        <div style="display: flex; gap: 6px; align-items: center;"><span>5G</span><span>98%</span></div>
+      </div>
+      <div style="background: #00473e; color: white; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 15px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="3"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          PayTaxi
+        </div>
+        <span style="background: #f59e0b; color: black; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px;">PASSENGER</span>
+      </div>
 
-    <!-- PRESENTATION BANNER 1920x1080 (PORTFOLIO THUMBNAIL) -->
-    <div id="view-thumbnail">
+      <div style="flex: 1; background: #f8fafc; padding: 16px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="background: white; border-radius: 16px; padding: 14px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <div style="font-size: 16px; font-weight: 800; color: #0f172a;">TX-1001</div>
+              <div style="font-size: 12px; color: #64748b;">Abebe Bikila &bull; Toyota HiAce</div>
+            </div>
+            <div class="eth-plate" style="font-size: 11px; padding: 2px 6px;">
+              <span class="flag"></span>
+              <span>AA 3-B12345</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 14px;">
+            <div style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase;">Select Minibus Stage</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px;">
+              <div style="background: #f1f5f9; padding: 8px 4px; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center;">10 ETB</div>
+              <div style="background: #f1f5f9; padding: 8px 4px; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center;">15 ETB</div>
+              <div style="background: #f1f5f9; padding: 8px 4px; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center;">20 ETB</div>
+              <div style="background: #00473e; color: white; padding: 8px 4px; border-radius: 8px; font-size: 12px; font-weight: 800; text-align: center;">25 ETB</div>
+              <div style="background: #f1f5f9; padding: 8px 4px; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center;">35 ETB</div>
+              <div style="background: #f1f5f9; padding: 8px 4px; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center;">50 ETB</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 12px; font-weight: 700;">Seats: <strong>2 Passengers</strong></div>
+            <div style="display: flex; gap: 8px;">
+              <span style="background: white; border: 1px solid #cbd5e1; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 800;">-</span>
+              <span style="background: white; border: 1px solid #cbd5e1; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 800;">+</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div style="background: white; border-radius: 14px; padding: 12px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 13px; font-weight: 600; color: #64748b;">Total Fare:</span>
+            <span style="font-size: 22px; font-weight: 800; color: #00473e;">50.00 ETB</span>
+          </div>
+          <button style="width: 100%; background: #00473e; color: white; border: none; padding: 14px; border-radius: 14px; font-weight: 700; font-size: 15px; box-shadow: 0 4px 15px rgba(0, 71, 62, 0.4);">
+            Pay 50.00 ETB with AddisPay
+          </button>
+          <div style="text-align: center; font-size: 11px; color: #94a3b8; margin-top: 8px;">🔒 Telebirr &bull; CBE Birr &bull; Awash</div>
+        </div>
+      </div>
+      <div class="phone-home-indicator"></div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MOBILE PHONE 2: WEYALA ANTI-FRAUD RECEIPT (ON SMARTPHONE)       -->
+    <!-- ============================================================== -->
+    <div id="phone-receipt" class="phone-device" style="background: #061e19; border-color: #00473e;">
+      <div class="phone-island"><div class="camera-lens"></div></div>
+      <div class="phone-status-bar dark">
+        <span>09:42</span>
+        <div style="display: flex; gap: 6px; align-items: center;"><span>5G</span><span>98%</span></div>
+      </div>
+      <div style="flex: 1; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; color: white;">
+        <div style="text-align: center; margin-top: 10px;">
+          <div style="width: 60px; height: 60px; background: #00a878; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; box-shadow: 0 0 25px #00a878;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div style="font-size: 11px; font-weight: 800; color: #4ade80; letter-spacing: 1.5px; text-transform: uppercase;">Payment Confirmed</div>
+          <div style="font-size: 38px; font-weight: 800; margin-top: 2px;">50.00 <span style="font-size: 18px; color: #a7f3d0;">ETB</span></div>
+          <div style="font-size: 12px; color: #94a3b8;">2 Seats &bull; Minibus Stage Fare</div>
+        </div>
+        <div style="background: rgba(0, 168, 120, 0.15); border: 1px solid #00a878; color: #4ade80; padding: 8px 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace;">
+          <div class="pulse-dot"></div>
+          <span>WEYALA ACTIVE: 09:48 REMAINING</span>
+        </div>
+        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 12.5px;">
+            <span style="color: #94a3b8;">Taxi Plate</span>
+            <div class="eth-plate" style="font-size: 11px; padding: 2px 4px;"><span class="flag"></span>AA 3-B12345</div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 12.5px;">
+            <span style="color: #94a3b8;">Taxi ID</span><span style="font-weight: 700; color: white;">TX-1001</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 12.5px;">
+            <span style="color: #94a3b8;">Driver</span><span style="font-weight: 700; color: white;">Abebe Bikila</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; font-size: 12px;">
+            <span style="color: #94a3b8;">Ref</span><span style="font-family: 'JetBrains Mono', monospace; color: #4ade80;">TXN-AP-992184</span>
+          </div>
+        </div>
+        <div style="background: rgba(0, 168, 120, 0.1); border: 1px dashed rgba(0, 168, 120, 0.4); border-radius: 12px; padding: 10px; text-align: center;">
+          <div style="font-size: 10px; color: #86efac; font-weight: 700; text-transform: uppercase;">Anti-Fraud Dynamic Seal</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #4ade80; margin-top: 2px;">TOKEN: 4F9B-782A &bull; SOUNDBOX SYNCED</div>
+        </div>
+        <div style="text-align: center; font-size: 11px; color: #64748b;">Show to Weyala (Conductor) on entry/exit</div>
+      </div>
+      <div class="phone-home-indicator" style="background: #334155;"></div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MOBILE PHONE 3: DRIVER SOUNDBOX MOBILE APP                     -->
+    <!-- ============================================================== -->
+    <div id="phone-soundbox" class="phone-device" style="background: #0f172a; border-color: #1e293b;">
+      <div class="phone-island"><div class="camera-lens"></div></div>
+      <div class="phone-status-bar dark">
+        <span>09:42</span>
+        <div style="display: flex; gap: 6px; align-items: center;"><span>5G</span><span>98%</span></div>
+      </div>
+      <div style="background: linear-gradient(135deg, #00473e, #032b24); color: white; padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-weight: 800; font-size: 16px;">TX-1001 &bull; Soundbox</div>
+          <span style="background: #4ade80; color: #022c26; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px;">● ONLINE</span>
+        </div>
+        <div style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between;">
+          <div style="font-size: 12px; color: #a7f3d0;">880 Hz Acoustic Chime Active</div>
+          <div class="audio-visualizer">
+            <div class="bar" style="height: 10px;"></div>
+            <div class="bar" style="height: 18px;"></div>
+            <div class="bar" style="height: 14px;"></div>
+            <div class="bar" style="height: 22px;"></div>
+            <div class="bar" style="height: 12px;"></div>
+          </div>
+        </div>
+      </div>
+      <div style="flex: 1; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; color: white;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 12px;">
+            <div style="font-size: 10px; color: #94a3b8; font-weight: 700;">TODAY'S REVENUE</div>
+            <div style="font-size: 20px; font-weight: 800; color: #4ade80; margin-top: 4px;">1,420 ETB</div>
+          </div>
+          <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 12px;">
+            <div style="font-size: 10px; color: #94a3b8; font-weight: 700;">OFFLINE PIN</div>
+            <div style="font-size: 18px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #f59e0b; margin-top: 4px;">ABCD1234</div>
+          </div>
+        </div>
+        <div style="background: rgba(0, 168, 120, 0.1); border: 1px solid rgba(0, 168, 120, 0.3); border-radius: 14px; padding: 14px;">
+          <div style="font-size: 11px; font-weight: 700; color: #4ade80; text-transform: uppercase;">Latest Spoken Announcement</div>
+          <div style="font-size: 14px; font-weight: 700; margin-top: 4px; color: white;">🔊 "Payment of 50 Birr received for 2 seats"</div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">AddisPay Telebirr &bull; 10 secs ago</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 12px; text-align: center;">
+          <div style="font-size: 11px; color: #94a3b8; margin-bottom: 8px;">Active Passenger Scannable QR</div>
+          <div style="background: white; padding: 10px; border-radius: 10px; display: inline-block;">
+            <svg width="100" height="100" viewBox="0 0 100 100" fill="#00473e">
+              <rect x="10" y="10" width="25" height="25" fill="#00473e" /><rect x="15" y="15" width="15" height="15" fill="#ffffff" /><rect x="18" y="18" width="9" height="9" fill="#00473e" />
+              <rect x="65" y="10" width="25" height="25" fill="#00473e" /><rect x="70" y="15" width="15" height="15" fill="#ffffff" /><rect x="73" y="18" width="9" height="9" fill="#00473e" />
+              <rect x="10" y="65" width="25" height="25" fill="#00473e" /><rect x="15" y="70" width="15" height="15" fill="#ffffff" /><rect x="18" y="73" width="9" height="9" fill="#00473e" />
+              <rect x="45" y="15" width="10" height="20" /><rect x="40" y="45" width="20" height="10" /><rect x="65" y="45" width="25" height="10" />
+            </svg>
+          </div>
+          <div style="font-size: 11px; font-weight: 700; color: #4ade80; margin-top: 6px;">Taxi TX-1001</div>
+        </div>
+      </div>
+      <div class="phone-home-indicator" style="background: #334155;"></div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MOBILE PHONE 4: EXPO CAMERA QR SCANNER                         -->
+    <!-- ============================================================== -->
+    <div id="phone-scanner" class="phone-device" style="background: #020617; border-color: #0f172a;">
+      <div class="phone-island"><div class="camera-lens"></div></div>
+      <div class="phone-status-bar dark">
+        <span>09:40</span>
+        <div style="display: flex; gap: 6px; align-items: center;"><span>5G</span><span>98%</span></div>
+      </div>
+      <div style="flex: 1; position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; color: white;">
+        <div style="text-align: center; z-index: 10;">
+          <div style="font-size: 16px; font-weight: 800;">Scan Taxi QR Code</div>
+          <div style="font-size: 12px; color: #94a3b8; margin-top: 2px;">Expo Camera Viewfinder Active</div>
+        </div>
+        <div style="position: relative; width: 240px; height: 240px; margin: 0 auto; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.65);">
+          <div style="position: absolute; top: -2px; left: -2px; width: 30px; height: 30px; border-top: 4px solid #4ade80; border-left: 4px solid #4ade80; border-radius: 8px 0 0 0;"></div>
+          <div style="position: absolute; top: -2px; right: -2px; width: 30px; height: 30px; border-top: 4px solid #4ade80; border-right: 4px solid #4ade80; border-radius: 0 8px 0 0;"></div>
+          <div style="position: absolute; bottom: -2px; left: -2px; width: 30px; height: 30px; border-bottom: 4px solid #4ade80; border-left: 4px solid #4ade80; border-radius: 0 0 0 8px;"></div>
+          <div style="position: absolute; bottom: -2px; right: -2px; width: 30px; height: 30px; border-bottom: 4px solid #4ade80; border-right: 4px solid #4ade80; border-radius: 0 0 8px 0;"></div>
+          <div style="width: 220px; height: 2px; background: #4ade80; box-shadow: 0 0 12px #4ade80;"></div>
+          <div style="position: absolute; opacity: 0.85;">
+            <svg width="120" height="120" viewBox="0 0 100 100" fill="#ffffff">
+              <rect x="10" y="10" width="25" height="25" /><rect x="15" y="15" width="15" height="15" fill="#000" /><rect x="18" y="18" width="9" height="9" />
+              <rect x="65" y="10" width="25" height="25" /><rect x="70" y="15" width="15" height="15" fill="#000" /><rect x="73" y="18" width="9" height="9" />
+              <rect x="10" y="65" width="25" height="25" /><rect x="15" y="70" width="15" height="15" fill="#000" /><rect x="18" y="73" width="9" height="9" />
+            </svg>
+          </div>
+        </div>
+        <div style="text-align: center; z-index: 10;">
+          <div style="background: rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 6px 14px; display: inline-block; font-size: 12px; margin-bottom: 14px;">
+            Target: <strong>https://paytaxi.et/t/TX-1001</strong>
+          </div>
+          <button style="width: 100%; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 12px; font-weight: 700; font-size: 13px;">
+            Enter Taxi Code Manually
+          </button>
+        </div>
+      </div>
+      <div class="phone-home-indicator" style="background: #334155;"></div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- DUAL-DEVICE SHOWCASE: DESKTOP WEB + SMARTPHONE SIDE-BY-SIDE    -->
+    <!-- ============================================================== -->
+    <div id="view-dual-platform">
       <div class="hero-glow-1"></div>
       <div class="hero-glow-2"></div>
-
-      <!-- Top Header -->
       <div style="display: flex; justify-content: space-between; align-items: center; z-index: 10;">
         <div style="display: flex; align-items: center; gap: 14px;">
           <div style="width: 44px; height: 44px; background: #00473e; border: 2px solid #00a878; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0, 168, 120, 0.4);">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5">
-              <rect x="2" y="5" width="20" height="14" rx="3" />
-              <line x1="2" y1="10" x2="22" y2="10" />
-            </svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="3"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
           </div>
           <div>
-            <div style="font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">PayTaxi Ethiopia</div>
-            <div style="font-size: 12px; color: #94a3b8; font-weight: 500;">Modern Urban Mobility & Transit FinTech</div>
+            <div style="font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">PayTaxi Ethiopia &bull; Cross-Platform Suite</div>
+            <div style="font-size: 12px; color: #94a3b8; font-weight: 500;">Next.js 16 Web Dashboard + React Native Expo Mobile App</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <span style="background: rgba(0, 168, 120, 0.2); border: 1px solid #00a878; color: #4ade80; padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 700;">● Unified Multi-Platform</span>
+          <span style="background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; color: #fcd34d; padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 700;">Web + Mobile In Sync</span>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: center; gap: 40px; z-index: 10; margin: 20px 0;">
+        <div class="laptop-frame">
+          <div class="browser-header">
+            <div class="browser-dots">
+              <div class="browser-dot" style="background: #ef4444;"></div>
+              <div class="browser-dot" style="background: #eab308;"></div>
+              <div class="browser-dot" style="background: #22c55e;"></div>
+            </div>
+            <div class="browser-address">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <span>https://pay-taxi-ethiopia.vercel.app/admin</span>
+            </div>
+          </div>
+          <div style="background: white; flex: 1; padding: 24px; color: #0f172a; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div>
+                <div style="font-size: 18px; font-weight: 800; color: #00473e;">Operations & Settlement Journal</div>
+                <div style="font-size: 12px; color: #64748b;">Daily automated platform margin (2.5%) and driver net payouts</div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <span style="background: #00473e; color: white; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;">4,210 Rides</span>
+                <span style="background: #dcfce7; color: #166534; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;">148,650 ETB Volume</span>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px;">
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px;">
+                <div style="font-size: 11px; color: #64748b; font-weight: 700;">GROSS VOLUME</div>
+                <div style="font-size: 18px; font-weight: 800; color: #0f172a;">148,650 ETB</div>
+              </div>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; border-left: 3px solid #00473e;">
+                <div style="font-size: 11px; color: #00473e; font-weight: 700;">PLATFORM FEE (2.5%)</div>
+                <div style="font-size: 18px; font-weight: 800; color: #00473e;">3,716.25 ETB</div>
+              </div>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px;">
+                <div style="font-size: 11px; color: #166534; font-weight: 700;">DRIVER DISBURSEMENTS</div>
+                <div style="font-size: 18px; font-weight: 800; color: #166534;">144,933.75 ETB</div>
+              </div>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px;">
+                <div style="font-size: 11px; color: #0369a1; font-weight: 700;">SUCCESS RATE</div>
+                <div style="font-size: 18px; font-weight: 800; color: #0369a1;">99.4%</div>
+              </div>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+              <thead style="background: #f1f5f9; color: #475569;">
+                <tr>
+                  <th style="padding: 8px 10px; text-align: left;">Time</th>
+                  <th style="padding: 8px 10px; text-align: left;">Taxi ID</th>
+                  <th style="padding: 8px 10px; text-align: left;">Plate</th>
+                  <th style="padding: 8px 10px; text-align: right;">Amount</th>
+                  <th style="padding: 8px 10px; text-align: right;">Driver (97.5%)</th>
+                  <th style="padding: 8px 10px; text-align: center;">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                  <td style="padding: 10px;">16:42:10</td>
+                  <td style="padding: 10px; font-weight: 700;">TX-1001</td>
+                  <td style="padding: 10px;"><span class="eth-plate" style="font-size: 10px; padding: 2px 4px;"><span class="flag"></span>AA 3-B12345</span></td>
+                  <td style="padding: 10px; text-align: right; font-weight: 800;">50.00 ETB</td>
+                  <td style="padding: 10px; text-align: right; color: #166534; font-weight: 700;">48.75 ETB</td>
+                  <td style="padding: 10px; text-align: center;"><span style="background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 800;">● SETTLED</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                  <td style="padding: 10px;">16:38:05</td>
+                  <td style="padding: 10px; font-weight: 700;">TX-1001</td>
+                  <td style="padding: 10px;"><span class="eth-plate" style="font-size: 10px; padding: 2px 4px;"><span class="flag"></span>AA 3-B12345</span></td>
+                  <td style="padding: 10px; text-align: right; font-weight: 800;">25.00 ETB</td>
+                  <td style="padding: 10px; text-align: right; color: #166534; font-weight: 700;">24.37 ETB</td>
+                  <td style="padding: 10px; text-align: center;"><span style="background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 800;">● SETTLED</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
+        <div style="transform: rotate(3deg) scale(0.92); box-shadow: 0 35px 80px rgba(0,0,0,0.8); border-radius: 52px;">
+          <div class="phone-device" style="background: #061e19; border-color: #00473e; height: 740px;">
+            <div class="phone-island"><div class="camera-lens"></div></div>
+            <div class="phone-status-bar dark"><span>09:42</span><div style="display: flex; gap: 6px; align-items: center;"><span>5G</span><span>98%</span></div></div>
+            <div style="flex: 1; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; color: white;">
+              <div style="text-align: center; margin-top: 10px;">
+                <div style="width: 58px; height: 58px; background: #00a878; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px auto; box-shadow: 0 0 25px #00a878;">
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div style="font-size: 11px; font-weight: 800; color: #4ade80;">WEYALA VERIFIED</div>
+                <div style="font-size: 36px; font-weight: 800;">50.00 <span style="font-size: 16px; color: #a7f3d0;">ETB</span></div>
+              </div>
+              <div style="background: rgba(0, 168, 120, 0.15); border: 1px solid #00a878; color: #4ade80; padding: 8px; border-radius: 12px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;">
+                ● TIMER: 09:48 REMAINING
+              </div>
+              <div style="background: rgba(255,255,255,0.06); border-radius: 14px; padding: 12px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px;">
+                  <span style="color: #94a3b8;">Plate</span>
+                  <div class="eth-plate" style="font-size: 10px; padding: 2px 4px;"><span class="flag"></span>AA 3-B12345</div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                  <span style="color: #94a3b8;">Taxi ID</span>
+                  <span style="font-weight: 700;">TX-1001</span>
+                </div>
+              </div>
+              <div style="background: rgba(0, 168, 120, 0.1); border: 1px dashed rgba(0, 168, 120, 0.4); border-radius: 10px; padding: 8px; text-align: center;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #4ade80;">TOKEN: 4F9B-782A &bull; SOUNDBOX SYNCED</div>
+              </div>
+            </div>
+            <div class="phone-home-indicator"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 16px; z-index: 10;">
+        <div style="display: flex; gap: 32px; font-size: 13px;">
+          <div><strong style="color: #4ade80;">Web Portal</strong>: Next.js 16 App Router &bull; Financial Ledger &bull; In-App Admin Settings</div>
+          <div><strong style="color: #fcd34d;">Mobile App</strong>: React Native Expo &bull; QR Scanner &bull; Real-Time Soundbox SSE</div>
+        </div>
+        <div style="font-size: 12px; color: #94a3b8;">Live on <span style="color: white; font-weight: 700;">Vercel &bull; Render &bull; Supabase</span></div>
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- UPDATED PORTFOLIO HERO THUMBNAIL (1920x1080)                   -->
+    <!-- ============================================================== -->
+    <div id="view-thumbnail">
+      <div class="hero-glow-1"></div>
+      <div class="hero-glow-2"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 44px; height: 44px; background: #00473e; border: 2px solid #00a878; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0, 168, 120, 0.4);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="3"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </div>
+          <div>
+            <div style="font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">PayTaxi Ethiopia</div>
+            <div style="font-size: 12px; color: #94a3b8; font-weight: 500;">Contactless Minibus Transit & Real-Time Soundbox Platform</div>
+          </div>
+        </div>
         <div style="display: flex; gap: 12px;">
           <span style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
             <span style="width: 8px; height: 8px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80;"></span>
             Live on Vercel & Render
           </span>
-          <span style="background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; color: #fcd34d; padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 700;">
-            ★ Production Case Study
-          </span>
+          <span style="background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; color: #fcd34d; padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 700;">★ Full Stack FinTech Case Study</span>
         </div>
       </div>
 
-      <!-- Main Banner Content -->
-      <div style="display: grid; grid-template-columns: 1.1fr 1.3fr; gap: 60px; align-items: center; z-index: 10;">
+      <div style="display: grid; grid-template-columns: 1.15fr 1.25fr; gap: 50px; align-items: center; z-index: 10;">
         <div>
           <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(0, 168, 120, 0.15); border: 1px solid #00a878; color: #4ade80; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-bottom: 20px;">
-            <span>🇪🇹 Addis Ababa Urban Transit Solution</span>
+            <span>🇪🇹 Addis Ababa Urban Transit FinTech</span>
           </div>
-
-          <h1 style="font-size: 60px; font-weight: 800; line-height: 1.08; letter-spacing: -1.8px; margin-bottom: 24px;">
-            Cashless Minibus Mobility & <span style="background: linear-gradient(135deg, #4ade80 0%, #fcd34d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Soundbox Payments</span>
+          <h1 style="font-size: 56px; font-weight: 800; line-height: 1.1; letter-spacing: -1.6px; margin-bottom: 22px;">
+            Cashless Minibus Payments & <span style="background: linear-gradient(135deg, #4ade80 0%, #fcd34d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Driver Soundbox Platform</span>
           </h1>
-
-          <p style="font-size: 20px; color: #cbd5e1; line-height: 1.5; margin-bottom: 36px; max-width: 620px;">
+          <p style="font-size: 19px; color: #cbd5e1; line-height: 1.5; margin-bottom: 30px; max-width: 620px;">
             Eliminating physical change shortages, fare fraud, and network drops in Ethiopian public transit with instant QR checkouts, animated anti-fraud receipts, and real-time audio chimes.
           </p>
-
-          <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-            <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 10px 16px; font-size: 14px; font-weight: 600; color: #e2e8f0;">Next.js 16 App Router</div>
-            <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 10px 16px; font-size: 14px; font-weight: 600; color: #e2e8f0;">Supabase PostgreSQL</div>
-            <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 10px 16px; font-size: 14px; font-weight: 600; color: #e2e8f0;">AddisPay Gateway</div>
-            <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 10px 16px; font-size: 14px; font-weight: 600; color: #e2e8f0;">SSE Web Audio Soundbox</div>
-            <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 10px 16px; font-size: 14px; font-weight: 600; color: #e2e8f0;">Prisma 7 ORM</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 8px 14px; font-size: 13px; font-weight: 600; color: #e2e8f0;">Next.js 16 Web</div>
+            <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 8px 14px; font-size: 13px; font-weight: 600; color: #e2e8f0;">React Native Mobile</div>
+            <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 8px 14px; font-size: 13px; font-weight: 600; color: #e2e8f0;">Supabase PostgreSQL</div>
+            <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 8px 14px; font-size: 13px; font-weight: 600; color: #e2e8f0;">AddisPay Gateway</div>
+            <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 8px 14px; font-size: 13px; font-weight: 600; color: #e2e8f0;">SSE Web Audio Soundbox</div>
           </div>
         </div>
 
-        <!-- Floating Mockup Composition -->
-        <div style="position: relative; height: 580px; display: flex; align-items: center; justify-content: center;">
-          <!-- Card 1: Anti-fraud receipt tilted left -->
-          <div style="position: absolute; left: 20px; top: 40px; transform: rotate(-5deg) scale(0.85); box-shadow: 0 30px 60px rgba(0,0,0,0.6); border-radius: 28px; z-index: 2;">
-            <div style="width: 380px; background: #061e19; border: 2px solid #00a878; border-radius: 28px; padding: 24px; color: white;">
-              <div style="text-align: center; margin-bottom: 12px;">
-                <div style="width: 50px; height: 50px; background: #00a878; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px auto;">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        <div style="position: relative; height: 560px; display: flex; align-items: center; justify-content: center;">
+          <div style="position: absolute; left: 0px; top: 30px; width: 560px; background: #0f172a; border-radius: 16px; border: 1.5px solid rgba(255,255,255,0.15); box-shadow: 0 30px 60px rgba(0,0,0,0.7); overflow: hidden; z-index: 2;">
+            <div style="background: #1e293b; padding: 8px 12px; display: flex; align-items: center; gap: 8px;">
+              <div style="display: flex; gap: 4px;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #eab308;"></div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #22c55e;"></div>
+              </div>
+              <div style="font-size: 10px; color: #94a3b8; font-family: 'JetBrains Mono', monospace;">pay-taxi-ethiopia.vercel.app/admin</div>
+            </div>
+            <div style="background: white; padding: 14px; color: #0f172a;">
+              <div style="font-weight: 800; font-size: 13px; color: #00473e;">Operations Financial Ledger</div>
+              <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; flex: 1;">
+                  <div style="font-size: 9px; color: #64748b;">GROSS VOLUME</div>
+                  <div style="font-weight: 800; font-size: 13px;">148,650 ETB</div>
                 </div>
-                <div style="font-size: 11px; font-weight: 800; color: #4ade80;">WEYALA ANTI-FRAUD VERIFIED</div>
-                <div style="font-size: 32px; font-weight: 800;">50.00 ETB</div>
-              </div>
-              <div style="background: rgba(0, 168, 120, 0.15); border: 1px solid #00a878; color: #4ade80; padding: 6px; border-radius: 10px; font-size: 12px; font-weight: 700; text-align: center;">
-                ● TIMER: 09:48 REMAINING
-              </div>
-              <div style="margin-top: 12px; font-size: 12px; color: #cbd5e1; display: flex; justify-content: space-between;">
-                <span>Taxi TX-1001</span>
-                <span>AA 3-B12345</span>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; flex: 1; border-left: 3px solid #00473e;">
+                  <div style="font-size: 9px; color: #00473e;">PLATFORM FEE (2.5%)</div>
+                  <div style="font-weight: 800; font-size: 13px; color: #00473e;">3,716 ETB</div>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Card 2: Driver soundbox card centered -->
-          <div style="position: absolute; right: 20px; bottom: 30px; transform: rotate(3deg) scale(0.9); box-shadow: 0 35px 70px rgba(0,0,0,0.7); border-radius: 28px; z-index: 3;">
-            <div style="width: 440px; background: white; border-radius: 24px; padding: 24px; color: #0f172a;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <span style="font-weight: 800; font-size: 16px; color: #00473e;">Driver Soundbox Hub</span>
-                <span style="background: #dcfce7; color: #166534; font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 8px;">● 880 Hz AUDIO ON</span>
+          <div style="position: absolute; right: 20px; bottom: 10px; transform: rotate(4deg) scale(0.85); z-index: 5; box-shadow: 0 40px 80px rgba(0,0,0,0.85); border-radius: 52px;">
+            <div class="phone-device" style="background: #061e19; border-color: #00473e; height: 620px; width: 330px;">
+              <div class="phone-island" style="width: 90px; height: 22px;"><div class="camera-lens"></div></div>
+              <div class="phone-status-bar dark" style="font-size: 10px;"><span>09:42</span><span>5G</span></div>
+              <div style="flex: 1; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; color: white;">
+                <div style="text-align: center;">
+                  <div style="width: 48px; height: 48px; background: #00a878; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px auto;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <div style="font-size: 9px; font-weight: 800; color: #4ade80;">WEYALA ANTI-FRAUD</div>
+                  <div style="font-size: 28px; font-weight: 800;">50.00 ETB</div>
+                </div>
+                <div style="background: rgba(0, 168, 120, 0.2); border: 1px solid #00a878; color: #4ade80; padding: 6px; border-radius: 8px; font-size: 10px; text-align: center; font-weight: 700;">
+                  ● TIMER: 09:48 REMAINING
+                </div>
+                <div style="background: rgba(255,255,255,0.06); padding: 8px; border-radius: 8px; font-size: 10px; display: flex; justify-content: space-between;">
+                  <span>TX-1001</span>
+                  <span>AA 3-B12345</span>
+                </div>
               </div>
-              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; margin-bottom: 12px;">
-                <div style="font-size: 11px; color: #64748b; font-weight: 700;">TODAY'S REVENUE</div>
-                <div style="font-size: 26px; font-weight: 800; color: #00473e;">1,420.00 ETB</div>
-              </div>
-              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 10px; font-size: 12px; font-weight: 600; color: #15803d;">
-                🔊 Announced: "Payment of 50 Birr received for 2 seats"
-              </div>
+              <div class="phone-home-indicator"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Bottom Badges / Metrics -->
-      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 24px; z-index: 10;">
-        <div style="display: flex; gap: 40px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 20px; z-index: 10;">
+        <div style="display: flex; gap: 36px;">
           <div>
-            <div style="font-size: 24px; font-weight: 800; color: #4ade80;">50 / 50</div>
-            <div style="font-size: 12px; color: #94a3b8;">Automated Unit Tests Passing</div>
+            <div style="font-size: 22px; font-weight: 800; color: #4ade80;">50 / 50</div>
+            <div style="font-size: 11px; color: #94a3b8;">Automated Unit Tests Passing</div>
           </div>
           <div>
-            <div style="font-size: 24px; font-weight: 800; color: #fcd34d;">&lt; 200 ms</div>
-            <div style="font-size: 12px; color: #94a3b8;">Soundbox Audio Latency</div>
+            <div style="font-size: 22px; font-weight: 800; color: #fcd34d;">&lt; 200 ms</div>
+            <div style="font-size: 11px; color: #94a3b8;">Soundbox Audio Latency</div>
           </div>
           <div>
-            <div style="font-size: 24px; font-weight: 800; color: #38bdf8;">3 Auth Modes</div>
-            <div style="font-size: 12px; color: #94a3b8;">OTP &bull; Backup PIN &bull; QR Login</div>
+            <div style="font-size: 22px; font-weight: 800; color: #38bdf8;">Web + Mobile</div>
+            <div style="font-size: 11px; color: #94a3b8;">Next.js 16 Edge &bull; Expo React Native</div>
           </div>
           <div>
-            <div style="font-size: 24px; font-weight: 800; color: #a78bfa;">Zero Code</div>
-            <div style="font-size: 12px; color: #94a3b8;">In-App Admin Runtime Settings</div>
+            <div style="font-size: 22px; font-weight: 800; color: #a78bfa;">Zero Code</div>
+            <div style="font-size: 11px; color: #94a3b8;">In-App Admin Runtime Settings</div>
           </div>
         </div>
-
-        <div style="font-size: 13px; color: #94a3b8;">
-          Designed & Engineered by <strong style="color: white;">PayTaxi Ethiopia Core Team</strong>
+        <div style="font-size: 12px; color: #94a3b8;">
+          Engineered for <strong style="color: white;">Portfolio, Upwork & Production Transit Operations</strong>
         </div>
       </div>
     </div>
 
-
-    <!-- ALL-IN-ONE COMBINED PRODUCT SHOWCASE (2000x1250) -->
+    <!-- ============================================================== -->
+    <!-- ALL-IN-ONE COMBINED PRODUCT SHOWCASE (2000x1250)               -->
+    <!-- ============================================================== -->
     <div id="view-combined">
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 18px;">
         <div>
-          <div style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">PayTaxi Ethiopia &bull; Complete Platform Architecture</div>
-          <div style="font-size: 14px; color: #94a3b8;">End-to-End Minibus Transit Digital Payment Ecosystem</div>
+          <div style="font-size: 26px; font-weight: 800; letter-spacing: -0.5px;">PayTaxi Ethiopia &bull; Full-Stack Architecture & Multi-Device Suite</div>
+          <div style="font-size: 13px; color: #94a3b8;">Complete Ecosystem: Passenger Mobile Web, Weyala Anti-Fraud Receipt, Driver Soundbox Hub, and Fleet Operations Ledger</div>
         </div>
         <div style="display: flex; gap: 10px;">
-          <span style="background: #00473e; border: 1px solid #00a878; color: #4ade80; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 700;">6 Integrated Subsystems</span>
-          <span style="background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; color: #fcd34d; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 700;">Production Grade</span>
+          <span style="background: #00473e; border: 1px solid #00a878; color: #4ade80; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 700;">Web &bull; Mobile &bull; Cloud API</span>
+          <span style="background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; color: #fcd34d; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 700;">Production Ready</span>
         </div>
       </div>
 
-      <!-- 6 Grid Screens Showcase -->
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 30px 0;">
-        <!-- Card 1 -->
-        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 20px;">
-          <div style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase; margin-bottom: 6px;">01 &bull; Passenger Checkout</div>
-          <div style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Dynamic Stage Fare Calculator</div>
-          <p style="font-size: 12.5px; color: #94a3b8; line-height: 1.4; margin-bottom: 12px;">Minibus preset stages (10–50 ETB), multi-seat passenger multipliers, and instant guest checkout without app download.</p>
-          <div style="background: #061815; border-radius: 12px; padding: 12px; border: 1px solid rgba(0, 168, 120, 0.3); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #4ade80;">
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 24px 0;">
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 18px;">
+          <div style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase; margin-bottom: 4px;">01 &bull; Passenger Checkout</div>
+          <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">Dynamic Minibus Fare Stages</div>
+          <p style="font-size: 12px; color: #94a3b8; line-height: 1.4; margin-bottom: 10px;">Minibus preset stages (10–50 ETB), multi-seat passenger multipliers, and instant guest checkout without app download.</p>
+          <div style="background: #061815; border-radius: 10px; padding: 10px; border: 1px solid rgba(0, 168, 120, 0.3); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #4ade80;">
             Taxi TX-1001 &bull; 2 Seats &bull; 50.00 ETB
           </div>
         </div>
 
-        <!-- Card 2 -->
-        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 20px;">
-          <div style="font-size: 11px; font-weight: 800; color: #4ade80; text-transform: uppercase; margin-bottom: 6px;">02 &bull; Weyala Anti-Fraud Receipt</div>
-          <div style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Transport-Grade Verification</div>
-          <p style="font-size: 12.5px; color: #94a3b8; line-height: 1.4; margin-bottom: 12px;">Animated green pulsing screen, live 10-minute expiry timer, official Ethiopian license plate badge, and anti-screenshot rolling hashes.</p>
-          <div style="background: #061815; border-radius: 12px; padding: 12px; border: 1px solid rgba(0, 168, 120, 0.3); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #4ade80;">
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 18px;">
+          <div style="font-size: 11px; font-weight: 800; color: #4ade80; text-transform: uppercase; margin-bottom: 4px;">02 &bull; Weyala Anti-Fraud Receipt</div>
+          <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">Transport-Grade Verification</div>
+          <p style="font-size: 12px; color: #94a3b8; line-height: 1.4; margin-bottom: 10px;">Animated pulsing green screen, live 10-minute expiry timer, official Ethiopian license plate badge, and anti-screenshot rolling hashes.</p>
+          <div style="background: #061815; border-radius: 10px; padding: 10px; border: 1px solid rgba(0, 168, 120, 0.3); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #4ade80;">
             Plate: AA 3-B12345 &bull; Timer: 09:48
           </div>
         </div>
 
-        <!-- Card 3 -->
-        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 20px;">
-          <div style="font-size: 11px; font-weight: 800; color: #f59e0b; text-transform: uppercase; margin-bottom: 6px;">03 &bull; Driver Soundbox Hub</div>
-          <div style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Hands-Free Audio Confirmation</div>
-          <p style="font-size: 12.5px; color: #94a3b8; line-height: 1.4; margin-bottom: 12px;">Hardware-grade SSE stream delivering dual-tone acoustic chimes (587 & 880 Hz) and spoken voice feedback directly to driver phones.</p>
-          <div style="background: #061815; border-radius: 12px; padding: 12px; border: 1px solid rgba(245, 158, 11, 0.3); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #fcd34d;">
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 18px;">
+          <div style="font-size: 11px; font-weight: 800; color: #f59e0b; text-transform: uppercase; margin-bottom: 4px;">03 &bull; Driver Soundbox Hub</div>
+          <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">Hands-Free Audio Confirmation</div>
+          <p style="font-size: 12px; color: #94a3b8; line-height: 1.4; margin-bottom: 10px;">Hardware-grade SSE stream delivering dual-tone acoustic chimes (587 & 880 Hz) and spoken voice feedback directly to driver phones.</p>
+          <div style="background: #061815; border-radius: 10px; padding: 10px; border: 1px solid rgba(245, 158, 11, 0.3); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #fcd34d;">
             🔊 Chime: 587Hz &rarr; 880Hz &bull; 1,420 ETB Today
           </div>
         </div>
 
-        <!-- Card 4 -->
-        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 20px;">
-          <div style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; margin-bottom: 6px;">04 &bull; Operations Manager Ledger</div>
-          <div style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Fleet Financial Governance</div>
-          <p style="font-size: 12.5px; color: #94a3b8; line-height: 1.4; margin-bottom: 12px;">Executive KPI analytics, automated 2.5% platform commission splits, driver net payouts (97.5%), and searchable audit trails.</p>
-          <div style="background: #061815; border-radius: 12px; padding: 12px; border: 1px solid rgba(167, 139, 250, 0.3); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #c4b5fd;">
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 18px;">
+          <div style="font-size: 11px; font-weight: 800; color: #a78bfa; text-transform: uppercase; margin-bottom: 4px;">04 &bull; Operations Manager Ledger</div>
+          <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">Fleet Financial Governance</div>
+          <p style="font-size: 12px; color: #94a3b8; line-height: 1.4; margin-bottom: 10px;">Executive KPI analytics, automated 2.5% platform commission splits, driver net payouts (97.5%), and searchable audit trails.</p>
+          <div style="background: #061815; border-radius: 10px; padding: 10px; border: 1px solid rgba(167, 139, 250, 0.3); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #c4b5fd;">
             Gross: 148,650 ETB &bull; Margin: 3,716 ETB
           </div>
         </div>
 
-        <!-- Card 5 -->
-        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 20px;">
-          <div style="font-size: 11px; font-weight: 800; color: #f43f5e; text-transform: uppercase; margin-bottom: 6px;">05 &bull; In-App Admin Settings</div>
-          <div style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Zero-Code Runtime Configuration</div>
-          <p style="font-size: 12.5px; color: #94a3b8; line-height: 1.4; margin-bottom: 12px;">Runtime controls for AddisPay keys, SMS gateway switching (Sandbox/Telegram/Twilio), KYC driver review, and PIN resets.</p>
-          <div style="background: #061815; border-radius: 12px; padding: 12px; border: 1px solid rgba(244, 63, 94, 0.3); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #fda4af;">
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 18px;">
+          <div style="font-size: 11px; font-weight: 800; color: #f43f5e; text-transform: uppercase; margin-bottom: 4px;">05 &bull; In-App Admin Settings</div>
+          <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">Zero-Code Runtime Configuration</div>
+          <p style="font-size: 12px; color: #94a3b8; line-height: 1.4; margin-bottom: 10px;">Runtime controls for AddisPay keys, SMS gateway switching (Sandbox/Telegram/Twilio), KYC driver review, and PIN resets.</p>
+          <div style="background: #061815; border-radius: 10px; padding: 10px; border: 1px solid rgba(244, 63, 94, 0.3); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #fda4af;">
             Config: system_setting &bull; Hot-Reload
           </div>
         </div>
 
-        <!-- Card 6 -->
-        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 20px;">
-          <div style="font-size: 11px; font-weight: 800; color: #34d399; text-transform: uppercase; margin-bottom: 6px;">06 &bull; Multi-Method Auth Fallback</div>
-          <div style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Network Outage Resilience</div>
-          <p style="font-size: 12.5px; color: #94a3b8; line-height: 1.4; margin-bottom: 12px;">3-layer auth system: 1-click free OTP auto-fill, Driver 8-character Backup PIN fallback, and WhatsApp-style QR code pairing.</p>
-          <div style="background: #061815; border-radius: 12px; padding: 12px; border: 1px solid rgba(52, 211, 153, 0.3); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #6ee7b7;">
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 18px;">
+          <div style="font-size: 11px; font-weight: 800; color: #34d399; text-transform: uppercase; margin-bottom: 4px;">06 &bull; Multi-Method Auth Fallback</div>
+          <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">Network Outage Resilience</div>
+          <p style="font-size: 12px; color: #94a3b8; line-height: 1.4; margin-bottom: 10px;">3-layer auth system: 1-click free OTP auto-fill, Driver 8-character Backup PIN fallback, and WhatsApp-style QR code pairing.</p>
+          <div style="background: #061815; border-radius: 10px; padding: 10px; border: 1px solid rgba(52, 211, 153, 0.3); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #6ee7b7;">
             PIN Fallback: ABCD1234 &bull; QR Session
           </div>
         </div>
       </div>
 
-      <!-- Bottom System Footer -->
-      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 20px;">
-        <div style="font-size: 13px; color: #94a3b8;">
-          Stack: Next.js 16 (App Router) &bull; Express 5 &bull; Supabase PostgreSQL &bull; AddisPay API &bull; Web Audio API &bull; Tailwind CSS
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 16px;">
+        <div style="font-size: 12px; color: #94a3b8;">
+          Frontend: Next.js 16 Edge &bull; Mobile: React Native Expo &bull; Backend: Express 5 + Prisma 7 &bull; DB: Supabase PostgreSQL
         </div>
-        <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4ade80;">
-          DEPLOYMENT: pay-taxi-ethiopia.vercel.app &bull; paytaxi-api.onrender.com
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #4ade80;">
+          pay-taxi-ethiopia.vercel.app &bull; paytaxi-api.onrender.com
         </div>
       </div>
     </div>
@@ -1202,14 +1035,26 @@ async function run() {
   await page.setViewport({ width: 2200, height: 1600, deviceScaleFactor: 2 });
   await page.goto('file:///' + htmlPath.replace(/\\/g, '/'), { waitUntil: 'networkidle0' });
 
-  // List of elements to capture as separate screenshots
+  // List of all elements to capture as separate screenshots
   const viewSpecs = [
-    { selector: '#view-passenger', filename: '01_passenger_checkout.png', desc: 'Passenger Minibus Checkout' },
-    { selector: '#view-receipt', filename: '02_anti_fraud_receipt.png', desc: 'Weyala Anti-Fraud Receipt' },
-    { selector: '#view-driver', filename: '03_driver_soundbox_dashboard.png', desc: 'Driver Soundbox Dashboard' },
-    { selector: '#view-manager', filename: '04_manager_financial_ledger.png', desc: 'Manager Financial Ledger' },
-    { selector: '#view-admin', filename: '05_admin_system_settings.png', desc: 'Admin Live System Settings' },
-    { selector: '#view-auth', filename: '06_multimethod_auth.png', desc: 'Multi-Method Authentication & Fallback' },
+    // Web Desktop Panels
+    { selector: '#view-passenger', filename: '01_passenger_checkout.png', desc: 'Passenger Minibus Checkout (Web)' },
+    { selector: '#view-receipt', filename: '02_anti_fraud_receipt.png', desc: 'Weyala Anti-Fraud Receipt (Web)' },
+    { selector: '#view-driver', filename: '03_driver_soundbox_dashboard.png', desc: 'Driver Soundbox Dashboard (Web)' },
+    { selector: '#view-manager', filename: '04_manager_financial_ledger.png', desc: 'Manager Financial Ledger (Web)' },
+    { selector: '#view-admin', filename: '05_admin_system_settings.png', desc: 'Admin Live System Settings (Web)' },
+    { selector: '#view-auth', filename: '06_multimethod_auth.png', desc: 'Multi-Method Authentication (Web)' },
+
+    // Mobile Smartphone Screens
+    { selector: '#phone-passenger', filename: 'mobile_01_passenger_checkout.png', desc: 'Passenger Checkout (Smartphone)' },
+    { selector: '#phone-receipt', filename: 'mobile_02_anti_fraud_receipt.png', desc: 'Weyala Anti-Fraud Receipt (Smartphone)' },
+    { selector: '#phone-soundbox', filename: 'mobile_03_driver_soundbox.png', desc: 'Driver Soundbox App (Smartphone)' },
+    { selector: '#phone-scanner', filename: 'mobile_04_qr_scanner.png', desc: 'Mobile Camera QR Scanner (Smartphone)' },
+
+    // Cross-Platform Dual Showcase (Desktop Laptop + Smartphone Side-by-Side)
+    { selector: '#view-dual-platform', filename: 'showcase_desktop_and_mobile.png', desc: 'Cross-Platform Web & Mobile Showcase' },
+
+    // Hero Thumbnail & All-In-One Showcase
     { selector: '#view-thumbnail', filename: 'portfolio_thumbnail.png', desc: '1920x1080 Portfolio Hero Thumbnail' },
     { selector: '#view-combined', filename: 'portfolio_combined_showcase.png', desc: 'Combined All-in-One Showcase' }
   ];
@@ -1241,11 +1086,10 @@ async function run() {
   }
 
   await browser.close();
-  console.log('--- All Portfolio Assets Generated Successfully! ---');
+  console.log('--- All 13 Portfolio Assets & Mobile Mockups Generated Successfully! ---');
 }
 
 run().catch(err => {
   console.error('Error generating portfolio assets:', err);
   process.exit(1);
 });
-

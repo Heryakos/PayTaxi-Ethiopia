@@ -41,28 +41,45 @@ In Addis Ababa, millions of commuters rely daily on shared blue-and-white minibu
 
 ## 📸 Portfolio UI Showcase & Assets
 
-### 1. Presentation Thumbnail & Hero Banner
-*1920x1080 publication-grade graphic for Dribbble, Behance, LinkedIn, and personal portfolio hero:*
+### 1. Unified Cross-Platform Showcase (Web Desktop + Smartphone Side-by-Side)
+*1920x1080 publication-grade graphic displaying the Desktop Operations Ledger alongside the Smartphone Passenger experience:*
+![Cross-Platform Web & Mobile Showcase](showcase_desktop_and_mobile.png)
+
+---
+
+### 2. Presentation Hero Thumbnail Banner
+*1920x1080 Hero Banner for portfolio websites, Dribbble, Behance, and LinkedIn:*
 ![Portfolio Hero Thumbnail](portfolio_thumbnail.png)
 
 ---
 
-### 2. End-to-End System Showcase
-*Complete composite layout displaying all 6 application pillars:*
-![Combined Showcase](portfolio_combined_showcase.png)
+### 3. Mobile Smartphone Mockups (Passenger & Driver Experience)
+
+| Mobile Screen | Preview | Real-World Use Case |
+|---|---|---|
+| **M1. Mobile Passenger Checkout** | ![Mobile Passenger Checkout](mobile_01_passenger_checkout.png) | In-minibus passenger interface with 10–50 ETB stage presets, seat counter, and 1-tap AddisPay payment. |
+| **M2. Mobile Weyala Receipt** | ![Mobile Weyala Receipt](mobile_02_anti_fraud_receipt.png) | High-contrast verification screen shown to the conductor (*Weyala*) with live 10-minute timer and plate badge. |
+| **M3. Mobile Driver Soundbox** | ![Mobile Driver Soundbox](mobile_03_driver_soundbox.png) | Driver dashboard mounted phone view with active 880 Hz audio visualizer, today's earnings, and backup PIN. |
+| **M4. Mobile Expo QR Scanner** | ![Mobile Camera QR Scanner](mobile_04_qr_scanner.png) | Native camera scanner HUD targeting the minibus sticker (`paytaxi.et/t/TX-1001`) with laser crosshair. |
 
 ---
 
-### 3. Key Screen Breakdowns
+### 4. Web Desktop Management Panels (Fleet Operators & Admins)
 
-| Screen | Preview | Description |
+| Web Portal Screen | Preview | Operational Capability |
 |---|---|---|
-| **01. Passenger Checkout** | ![Passenger Checkout](01_passenger_checkout.png) | Minibus stage fare selector (10–50 ETB), multi-seat count multiplier, vehicle verification badge, and AddisPay integration. |
-| **02. Weyala Anti-Fraud Receipt** | ![Anti-Fraud Receipt](02_anti_fraud_receipt.png) | Animated pulsing green confirmation, Ethiopian license plate badge (`AA 3-B12345`), live ticking timer, and anti-screenshot rolling security seal. |
-| **03. Driver Soundbox Hub** | ![Driver Dashboard](03_driver_soundbox_dashboard.png) | Real-time Web Audio chime (587 & 880 Hz) + speech synthesis, scannable TX-1001 taxi QR, today's revenue KPIs, and live audio announcement log. |
-| **04. Manager Financial Ledger** | ![Manager Ledger](04_manager_financial_ledger.png) | Executive KPI dashboard tracking gross volume (148,650 ETB), automated 2.5% platform commissions, net driver payouts, and filterable transactions. |
-| **05. Admin Live Settings** | ![Admin Settings](05_admin_system_settings.png) | Zero-code runtime configuration for payment gateway credentials, SMS delivery provider switching, and transit fare parameters. |
-| **06. Multi-Method Auth** | ![Multi-Method Auth](06_multimethod_auth.png) | 3-in-1 resilient sign-in: 1-Click free test OTP auto-fill, Driver Backup PIN fallback for SMS outages, and WhatsApp-style QR login. |
+| **W1. Operations Manager Ledger** | ![Manager Ledger](04_manager_financial_ledger.png) | Real-time financial hub tracking gross revenue (148,650 ETB), 2.5% platform commission, and driver net payouts. |
+| **W2. Admin Live Settings** | ![Admin Settings](05_admin_system_settings.png) | Hot-reload runtime editor for AddisPay credentials, SMS gateway selector (Sandbox/Telegram/Twilio), and fare rules. |
+| **W3. Multi-Method Auth** | ![Multi-Method Auth](06_multimethod_auth.png) | 3-layer login: 1-Click free test OTP, Driver Backup PIN (`ABCD1234`), and WhatsApp-style dynamic QR code pairing. |
+| **W4. Passenger Web Checkout** | ![Passenger Checkout](01_passenger_checkout.png) | Zero-install web checkout accessible from any smartphone browser without app store download. |
+| **W5. Weyala Anti-Fraud Receipt** | ![Anti-Fraud Receipt](02_anti_fraud_receipt.png) | Cryptographic security seal with dynamic token `TOKEN: 4F9B-782A` preventing screenshot replay attacks. |
+| **W6. Driver Soundbox Hub** | ![Driver Dashboard](03_driver_soundbox_dashboard.png) | Full desktop Soundbox console with real-time SSE payment broadcaster and printable taxi QR code. |
+
+---
+
+### 5. Complete All-In-One Composite Architecture
+*Full infographic showing all 6 platform subsystems:*
+![Combined Showcase](portfolio_combined_showcase.png)
 
 ---
 

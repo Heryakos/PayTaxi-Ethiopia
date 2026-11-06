@@ -200,16 +200,46 @@ function putJson(path: string, payload?: unknown) {
   return apiFetch(path, { method: "PUT", body: payload ? JSON.stringify(payload) : undefined })
 }
 
+// ---------- Authentic Ethiopian Vehicle Plate Badge ----------
+export function EthiopianPlate({
+  plate,
+  size = "md",
+}: {
+  plate?: string | null
+  size?: "sm" | "md" | "lg"
+}) {
+  const isSm = size === "sm"
+  const isLg = size === "lg"
+  const text = plate || "AA 3-B12345"
+  return (
+    <div
+      className={`inline-flex items-center gap-1.5 rounded-md border-2 border-black bg-white font-mono font-black text-black shadow-sm ${
+        isSm ? "px-1.5 py-0.5 text-[11px]" : isLg ? "px-3 py-1.5 text-base" : "px-2 py-1 text-xs"
+      }`}
+    >
+      <span className="flex h-2.5 w-3.5 flex-col overflow-hidden rounded-[1px] border border-black/20">
+        <span className="h-1/3 bg-[#078930]" />
+        <span className="h-1/3 bg-[#FCDD09]" />
+        <span className="h-1/3 bg-[#DA121A]" />
+      </span>
+      <span className="tracking-wider">{text}</span>
+    </div>
+  )
+}
+
 // ---------- Brand ----------
 function Brand() {
   const t = useTranslations("nav")
   return (
     <div className="flex items-center gap-3">
-      <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+      <div className="flex size-10 items-center justify-center rounded-xl bg-[#00473e] text-white shadow-sm ring-1 ring-emerald-500/30">
         <QrCode className="size-5" />
       </div>
       <div>
-        <p className="font-mono text-sm font-bold tracking-tight">{t("brand_name")}</p>
+        <div className="flex items-center gap-1.5">
+          <p className="font-mono text-sm font-bold tracking-tight text-foreground">{t("brand_name")}</p>
+          <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-black uppercase text-amber-700 dark:text-amber-300">ET</span>
+        </div>
         <p className="text-[11px] text-muted-foreground">{t("brand_tagline")}</p>
       </div>
     </div>
@@ -248,85 +278,91 @@ function WeyalaReceipt({
 
   return (
     <main className="mx-auto max-w-lg px-4 py-8 sm:px-6">
-      <div className="relative overflow-hidden rounded-3xl border-2 border-emerald-500/40 bg-card p-6 shadow-2xl sm:p-8">
+      <div className="relative overflow-hidden rounded-3xl border-2 border-emerald-500/50 bg-[#061e19] p-6 text-white shadow-2xl sm:p-8">
         {/* Animated dynamic security watermark pattern */}
-        <div className="pointer-events-none absolute -right-20 -top-20 size-60 rounded-full bg-emerald-500/10 blur-3xl animate-pulse" />
-        <div className="pointer-events-none absolute -bottom-20 -left-20 size-60 rounded-full bg-primary/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 -top-20 size-60 rounded-full bg-emerald-500/20 blur-3xl animate-pulse" />
+        <div className="pointer-events-none absolute -bottom-20 -left-20 size-60 rounded-full bg-emerald-500/10 blur-3xl" />
 
         {/* Big pulsing verification badge for the Weyala */}
         <div className="relative flex flex-col items-center text-center">
-          <div className="relative flex size-20 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/30">
+          <div className="relative flex size-20 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/40 ring-4 ring-emerald-400/30">
             <CheckCircle2 className="size-11" />
-            <span className="absolute -inset-1.5 rounded-full border-2 border-emerald-400/60 animate-ping" />
+            <span className="absolute -inset-2 rounded-full border-2 border-emerald-400/60 animate-ping" />
           </div>
 
-          <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
-            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-            {t("verified_banner")}
+          <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/20 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-emerald-300">
+            <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
+            WEYALA VERIFICATION ACTIVE: {Math.max(0, 600 - secondsAgo)}s REMAINING
           </div>
 
-          <p className="mt-2 text-sm font-semibold text-emerald-800 dark:text-emerald-300">
+          <p className="mt-2 text-sm font-semibold text-emerald-200">
             {t("weyala_instruction")}
           </p>
 
           {/* Live pulsing timer */}
-          <div className="mt-3 flex items-center gap-2 rounded-xl bg-muted/60 px-3.5 py-1.5 font-mono text-xs font-semibold text-foreground">
-            <Clock3 className="size-3.5 text-emerald-600 animate-spin" />
+          <div className="mt-3 flex items-center gap-2 rounded-xl bg-white/10 px-3.5 py-1.5 font-mono text-xs font-semibold text-white/90">
+            <Clock3 className="size-3.5 text-emerald-400 animate-spin" />
             <span>{t("live_timer", { seconds: secondsAgo })}</span>
-            <span className="text-muted-foreground">·</span>
-            <span className="text-muted-foreground">{currentTime}</span>
+            <span className="text-white/40">·</span>
+            <span className="text-white/70">{currentTime}</span>
           </div>
         </div>
 
         {/* Ethiopian Minibus Amount Display */}
-        <div className="mt-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-6 text-center">
-          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("amount_paid")}</p>
+        <div className="mt-6 rounded-2xl border border-emerald-500/30 bg-white/5 p-6 text-center">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-300/80">{t("amount_paid")}</p>
           <div className="mt-1 flex items-baseline justify-center gap-2">
-            <span className="text-5xl font-black tracking-tight text-foreground">{receipt.amount}</span>
-            <span className="font-mono text-xl font-bold text-emerald-600">ETB</span>
+            <span className="text-5xl font-black tracking-tight text-white">{receipt.amount}</span>
+            <span className="font-mono text-xl font-bold text-emerald-400">ETB</span>
           </div>
-          <p className="mt-1 text-xs font-medium text-muted-foreground">
+          <p className="mt-1 text-xs font-medium text-emerald-200/70">
             {receipt.label} · {receipt.seats} {t("seats_paid")}
           </p>
         </div>
 
         {/* Taxi & Driver Identification Card */}
-        <div className="mt-6 space-y-3 rounded-2xl border border-border bg-background/50 p-4">
-          <div className="flex items-center justify-between border-b border-border pb-3">
-            <span className="text-xs font-medium text-muted-foreground">{t("plate_label")}</span>
-            <div className="inline-flex items-center gap-1.5 rounded-lg border-2 border-foreground/20 bg-muted px-2.5 py-1 font-mono text-sm font-black tracking-wider text-foreground">
-              <Car className="size-4 text-primary" />
-              <span>{receipt.driver.plateNumber || receipt.taxiId}</span>
-            </div>
+        <div className="mt-6 space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <span className="text-xs font-medium text-slate-300">{t("plate_label")}</span>
+            <EthiopianPlate plate={receipt.driver.plateNumber || receipt.taxiId} size="sm" />
           </div>
 
-          <div className="flex items-center justify-between border-b border-border pb-3 text-sm">
-            <span className="text-xs font-medium text-muted-foreground">{t("taxi_id_label")}</span>
-            <span className="font-mono font-bold text-primary">{receipt.taxiId}</span>
+          <div className="flex items-center justify-between border-b border-white/10 pb-3 text-sm">
+            <span className="text-xs font-medium text-slate-300">{t("taxi_id_label")}</span>
+            <span className="font-mono font-bold text-emerald-400">{receipt.taxiId}</span>
           </div>
 
-          <div className="flex items-center justify-between border-b border-border pb-3 text-sm">
-            <span className="text-xs font-medium text-muted-foreground">{t("driver_label")}</span>
-            <span className="font-semibold text-foreground">{receipt.driver.displayName}</span>
+          <div className="flex items-center justify-between border-b border-white/10 pb-3 text-sm">
+            <span className="text-xs font-medium text-slate-300">{t("driver_label")}</span>
+            <span className="font-semibold text-white">{receipt.driver.displayName}</span>
           </div>
 
           {receipt.driver.vehicleMake && (
-            <div className="flex items-center justify-between border-b border-border pb-3 text-sm">
-              <span className="text-xs font-medium text-muted-foreground">Vehicle</span>
-              <span className="text-xs text-muted-foreground">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3 text-sm">
+              <span className="text-xs font-medium text-slate-300">Vehicle</span>
+              <span className="text-xs text-slate-300">
                 {receipt.driver.vehicleMake} {receipt.driver.vehicleModel || ""} {receipt.driver.vehicleColor ? `(${receipt.driver.vehicleColor})` : ""}
               </span>
             </div>
           )}
 
-          <div className="flex items-center justify-between pt-1 text-xs text-muted-foreground">
-            <span>{t("security_hash")}</span>
-            <span className="font-mono font-semibold tracking-wider text-foreground">{shortCode}</span>
+          <div className="flex items-center justify-between border-b border-white/10 pb-3 text-xs">
+            <span className="text-slate-300">AddisPay Reference</span>
+            <span className="font-mono font-semibold text-emerald-400">TXN-AP-{receipt.id.slice(0, 8).toUpperCase()}</span>
+          </div>
+
+          <div className="pt-2 text-center">
+            <div className="rounded-xl border border-dashed border-emerald-500/40 bg-emerald-500/10 p-2.5">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-300">Anti-Fraud Security Seal</div>
+              <div className="mt-0.5 font-mono text-xs font-bold text-emerald-400 tracking-wider">
+                TOKEN: {shortCode} · SOUNDBOX SYNCED
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Anti-fraud note */}
-        <p className="mt-4 text-center text-[11px] leading-4 text-muted-foreground">
+        <p className="mt-4 text-center text-[11px] leading-4 text-slate-300">
           {t("anti_fraud_notice")}
         </p>
 
@@ -334,13 +370,13 @@ function WeyalaReceipt({
         <div className="mt-6 flex flex-col gap-2.5">
           <button
             onClick={onClose}
-            className="w-full rounded-xl bg-primary px-4 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-95"
+            className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white shadow-lg transition-opacity hover:opacity-95"
           >
             {t("done_btn")}
           </button>
           <button
             onClick={onNewPayment}
-            className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-semibold text-muted-foreground hover:text-foreground"
+            className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/20"
           >
             {t("new_payment")}
           </button>
@@ -463,14 +499,15 @@ function PassengerPay({
           />
 
           {taxiDetails && (
-            <div className="mt-3 flex items-center justify-between rounded-xl bg-primary/5 px-3.5 py-2 text-xs">
+            <div className="mt-3 flex items-center justify-between rounded-xl bg-emerald-500/10 p-3.5 border border-emerald-500/20">
               <div>
-                <span className="font-semibold text-foreground">{taxiDetails.driver.displayName}</span>
-                <span className="text-muted-foreground"> · {taxiDetails.driver.vehicleMake} {taxiDetails.driver.vehicleColor}</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-foreground text-sm">{taxiDetails.driver.displayName}</span>
+                  <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-emerald-300">✓ VERIFIED</span>
+                </div>
+                <span className="text-xs text-muted-foreground">{taxiDetails.driver.vehicleMake || "Toyota HiAce Minibus"} {taxiDetails.driver.vehicleColor || "(Blue/White)"}</span>
               </div>
-              <span className="rounded-md border border-primary/20 bg-card px-2 py-0.5 font-mono font-bold text-primary">
-                {taxiDetails.driver.plateNumber}
-              </span>
+              <EthiopianPlate plate={taxiDetails.driver.plateNumber} size="sm" />
             </div>
           )}
         </div>
@@ -1333,7 +1370,9 @@ function DriverDashboard({
             </span>
           </div>
           <p className="mt-4 font-mono text-2xl font-bold text-primary">{currentData.qr?.taxiId ?? t("no_qr")}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Plate: {currentData.driver.plateNumber}</p>
+          <div className="mt-1.5 flex items-center gap-2">
+            <EthiopianPlate plate={currentData.driver.plateNumber} size="sm" />
+          </div>
           {currentData.qr?.taxiId && (
             <a
               href={`${API}/qr/${currentData.qr.taxiId}.png`}
@@ -1347,6 +1386,30 @@ function DriverDashboard({
           )}
         </div>
       </div>
+
+      {/* Driver Backup PIN Banner */}
+      {currentData.qr?.backupCode && (
+        <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400">
+              <Lock className="size-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">
+                Driver Offline Backup PIN
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Bypass SMS verification when mobile networks experience outages
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-lg font-black tracking-widest text-amber-800 dark:text-amber-200 bg-card px-3.5 py-1.5 rounded-xl border border-amber-500/30 shadow-sm">
+              {currentData.qr.backupCode}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Action Buttons */}
       <div className="mt-6 flex flex-wrap gap-3">
@@ -1592,8 +1655,8 @@ function ManagerPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogou
                       {tx.qr?.taxiId || "TX-N/A"}
                     </td>
                     <td className="py-3">
-                      <p className="font-semibold">{tx.driverProfile?.displayName || "Driver"}</p>
-                      <p className="font-mono text-[10px] text-muted-foreground">{tx.driverProfile?.plateNumber || "Plate"}</p>
+                      <p className="font-semibold text-foreground mb-1">{tx.driverProfile?.displayName || "Driver"}</p>
+                      <EthiopianPlate plate={tx.driverProfile?.plateNumber} size="sm" />
                     </td>
                     <td className="py-3 font-mono text-muted-foreground">
                       {tx.passengerUser?.phone || "Guest Passenger"}
@@ -1937,10 +2000,10 @@ function AdminPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout:
                         </span>
                       </div>
                       <p className="font-mono text-xs text-muted-foreground">{driver.phone}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {driver.vehicleColor ?? ""} {driver.vehicleMake ?? ""} {driver.vehicleModel ?? ""} · Plate:{" "}
-                        <strong className="font-mono text-foreground">{driver.plateNumber}</strong>
-                      </p>
+                      <div className="mt-1 flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">{driver.vehicleColor ?? ""} {driver.vehicleMake ?? ""} {driver.vehicleModel ?? ""}</span>
+                        <EthiopianPlate plate={driver.plateNumber} size="sm" />
+                      </div>
                       {driver.activeTaxiId && (
                         <p className="text-xs font-semibold text-primary">
                           {t("taxi_assigned")}: <span className="font-mono">{driver.activeTaxiId}</span>
@@ -2610,9 +2673,10 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
                     <BadgeCheck className="size-3.5" />{tTaxi("verified")}
                   </div>
                   <h2 className="mt-4 text-2xl font-bold">{taxiInfo.taxiId} · {taxiInfo.driver.displayName}</h2>
-                  <p className="mt-2 text-muted-foreground">
-                    {taxiInfo.driver.plateNumber} · {taxiInfo.driver.vehicleMake ?? ""} {taxiInfo.driver.vehicleModel ?? ""} {taxiInfo.driver.vehicleColor ?? ""}
-                  </p>
+                  <div className="mt-2.5 flex items-center gap-2">
+                    <EthiopianPlate plate={taxiInfo.driver.plateNumber} size="sm" />
+                    <span className="text-xs text-muted-foreground">· {taxiInfo.driver.vehicleMake ?? "Toyota HiAce"} {taxiInfo.driver.vehicleColor ?? "Minibus"}</span>
+                  </div>
                 </div>
                 <button
                   onClick={() => setView("pay")}

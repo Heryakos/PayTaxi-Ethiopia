@@ -10,16 +10,22 @@
 
 ## Portfolio Suite & Presentation Assets
 - **Location**: `docs/portfolio/`
+- **Cross-Platform Dual Showcase (Desktop Laptop + Phone Side-by-Side 1920x1080 @2x)**: `docs/portfolio/showcase_desktop_and_mobile.png`
 - **Portfolio Thumbnail / Hero Banner (1920x1080 @2x)**: `docs/portfolio/portfolio_thumbnail.png`
 - **Combined All-in-One Product Showcase**: `docs/portfolio/portfolio_combined_showcase.png`
-- **UI Screenshots (@2x Crisp Retina)**:
+- **Mobile Smartphone Mockups (@2x Retina)**:
+  - `mobile_01_passenger_checkout.png` — Mobile minibus checkout on smartphone device frame.
+  - `mobile_02_anti_fraud_receipt.png` — Smartphone Weyala receipt with live ticking timer and Ethiopian plate.
+  - `mobile_03_driver_soundbox.png` — Smartphone Driver Soundbox app with audio visualizer and today's revenue.
+  - `mobile_04_qr_scanner.png` — Smartphone camera viewfinder scanning taxi QR with crosshair laser.
+- **Web Desktop UI Screenshots (@2x Crisp Retina)**:
   - `01_passenger_checkout.png` — Passenger minibus fare stage selector (10–50 ETB), multi-seat count, vehicle verification.
   - `02_anti_fraud_receipt.png` — Weyala anti-fraud animated green receipt with live ticking timer, plate badge (`AA 3-B12345`), and security code.
   - `03_driver_soundbox_dashboard.png` — Driver Soundbox hub with active audio chime indicator (587 & 880 Hz), TX-1001 QR, and earnings.
   - `04_manager_financial_ledger.png` — Operations Manager financial hub with KPI cards (Gross volume, 2.5% platform commission, net payouts) and audit journal.
   - `05_admin_system_settings.png` — Super Admin console with runtime In-App Live Settings (AddisPay credentials, SMS gateway selector, transit rules).
   - `06_multimethod_auth.png` — 3-in-1 multi-method sign-in: 1-click test OTP, Driver Backup PIN (`ABCD1234`), and WhatsApp QR.
-- **Copy-Paste Portfolio Case Study**: `docs/portfolio/PORTFOLIO_CASE_STUDY.md` (Ready for portfolio websites, Behance, Notion, Framer, Webflow, GitHub).
+- **Copy-Paste Portfolio Case Study**: `docs/portfolio/PORTFOLIO_CASE_STUDY.md` (Ready for portfolio websites, Upwork, Behance, Notion, Framer, Webflow, GitHub).
 - **Executive PDF Case Study**: `docs/PAYTAXI_PORTFOLIO_CASE_STUDY.pdf`
 - **Asset Generator Script**: `scripts/generate_portfolio_assets.js` (Run: `node scripts/generate_portfolio_assets.js`)
 
