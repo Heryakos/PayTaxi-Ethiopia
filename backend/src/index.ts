@@ -9,6 +9,7 @@ import paymentsRoutes from './routes/payments';
 import webhooksRoutes from './routes/webhooks';
 import qrRoutes from './routes/qr';
 import dashboardRoutes from './routes/dashboard';
+import adminRoutes from './routes/admin';
 
 dotenv.config();
 
@@ -48,6 +49,7 @@ app.use('/payments', paymentsRoutes);
 app.use('/webhooks', webhooksRoutes);
 app.use('/qr', qrRoutes);
 app.use('/dashboard', dashboardRoutes);
+app.use('/admin', adminRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });

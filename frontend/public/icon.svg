@@ -1,26 +1,43 @@
-<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <style>
-    @media (prefers-color-scheme: light) {
-      .background { fill: black; }
-      .foreground { fill: white; }
-    }
-    @media (prefers-color-scheme: dark) {
-      .background { fill: white; }
-      .foreground { fill: black; }
-    }
-  </style>
-  <g clip-path="url(#clip0_7960_43945)">
-    <rect class="background" width="180" height="180" rx="37" />
-    <g style="transform: scale(95%); transform-origin: center">
-      <path class="foreground"
-        d="M101.141 53H136.632C151.023 53 162.689 64.6662 162.689 79.0573V112.904H148.112V79.0573C148.112 78.7105 148.098 78.3662 148.072 78.0251L112.581 112.898C112.701 112.902 112.821 112.904 112.941 112.904H148.112V126.672H112.941C98.5504 126.672 86.5638 114.891 86.5638 100.5V66.7434H101.141V100.5C101.141 101.15 101.191 101.792 101.289 102.422L137.56 66.7816C137.255 66.7563 136.945 66.7434 136.632 66.7434H101.141V53Z" />
-      <path class="foreground"
-        d="M65.2926 124.136L14 66.7372H34.6355L64.7495 100.436V66.7372H80.1365V118.47C80.1365 126.278 70.4953 129.958 65.2926 124.136Z" />
-    </g>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
   <defs>
-    <clipPath id="clip0_7960_43945">
-      <rect width="180" height="180" fill="white" />
-    </clipPath>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#023e36"/>
+      <stop offset="50%" stop-color="#00473e"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
   </defs>
+
+  <!-- Base Rounded Container -->
+  <rect width="180" height="180" rx="38" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle Inner Border -->
+  <rect x="4" y="4" width="172" height="172" rx="34" fill="none" stroke="#34D399" stroke-opacity="0.25" stroke-width="2"/>
+
+  <!-- Brand Elements -->
+  <g filter="url(#glow)">
+    <!-- Taxi Light Bar on top -->
+    <rect x="62" y="32" width="56" height="14" rx="7" fill="url(#goldGrad)"/>
+    
+    <!-- Stylized Modern Minibus / Taxi Cab Body -->
+    <path d="M42 72 C42 60 52 52 64 50 L116 50 C128 52 138 60 138 72 L144 102 C145 107 141 112 135 112 L131 112 C127 112 124 109 123 105 L121 96 L59 96 L57 105 C56 109 53 112 49 112 L45 112 C39 112 35 107 36 102 Z" fill="#FFFFFF"/>
+    
+    <!-- Taxi Windshield -->
+    <path d="M54 74 C54 66 60 60 68 59 L112 59 C120 60 126 66 126 74 L123 88 L57 88 Z" fill="#023E36"/>
+
+    <!-- Dual Headlights (Ethiopian Gold) -->
+    <circle cx="51" cy="98" r="6" fill="url(#goldGrad)"/>
+    <circle cx="129" cy="98" r="6" fill="url(#goldGrad)"/>
+
+    <!-- Digital QR / Weyala Contactless Beam (PayTaxi wave) -->
+    <path d="M58 132 C72 122 108 122 122 132" fill="none" stroke="url(#goldGrad)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M68 144 C78 137 102 137 112 144" fill="none" stroke="#34D399" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="90" cy="154" r="3" fill="#FFFFFF"/>
+  </g>
 </svg>

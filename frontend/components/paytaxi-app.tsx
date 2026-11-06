@@ -5,15 +5,53 @@ import {
   BadgeCheck, Check, Clock3, LogOut, QrCode, ShieldCheck, Smartphone,
   WalletCards, Globe, CheckCircle2, Car, ArrowLeft, Users, Sparkles,
   Volume2, VolumeX, Shield, AlertCircle, FileText, CheckCircle, XCircle,
-  RefreshCw, Upload, Eye, ExternalLink, X, Image as ImageIcon
+  RefreshCw, Upload, Eye, ExternalLink, X, Image as ImageIcon,
+  Key, Settings, Sliders, BarChart3, TrendingUp, UserCheck, Save, Search,
+  Lock, CreditCard, Send, SmartphoneNfc, Phone, ChevronRight
 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { FARE_PRESETS } from "@paytaxi/shared"
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
 
-type UserRole = "PASSENGER" | "DRIVER" | "ADMIN"
-type User = { id: string; phone: string; role: UserRole }
+type UserRole = "PASSENGER" | "DRIVER" | "MANAGER" | "ADMIN"
+type User = { id: string; phone: string; role: UserRole; name?: string | null }
+
+type SystemSetting = {
+  key: string
+  value: string
+  description: string | null
+  category: string
+  updatedAt: string
+}
+
+type AdminUser = {
+  id: string
+  phone: string
+  role: UserRole
+  name: string | null
+  isVerified: boolean
+  createdAt: string
+  driverProfile?: {
+    displayName: string
+    plateNumber: string
+    vehicleMake: string | null
+    vehicleModel: string | null
+    qrs?: { taxiId: string; backupCode: string | null; status: string }[]
+  } | null
+}
+
+type ReportMetrics = {
+  grossRevenue: number
+  platformCommission: number
+  driverNetPayouts: number
+  completedRides: number
+  totalAttempts: number
+  averageFare: number
+  totalDrivers: number
+  pendingDrivers: number
+  activeTaxis: number
+}
 
 type TaxiPublicInfo = {
   taxiId: string
@@ -147,6 +185,10 @@ async function apiFetch(path: string, options: RequestInit = {}) {
 
 function postJson(path: string, payload?: unknown) {
   return apiFetch(path, { method: "POST", body: payload ? JSON.stringify(payload) : undefined })
+}
+
+function putJson(path: string, payload?: unknown) {
+  return apiFetch(path, { method: "PUT", body: payload ? JSON.stringify(payload) : undefined })
 }
 
 // ---------- Brand ----------
@@ -603,56 +645,287 @@ function PassengerPay({
   )
 }
 
-// ---------- OTP Auth ----------
+// ---------- Multi-Method Auth (Phone OTP, Driver PIN Fallback, QR Session) ----------
 function OtpAuth({ role, onSuccess, onBack }: { role: UserRole; onSuccess: (user: User) => void; onBack: () => void }) {
   const t = useTranslations("auth")
+  const [authMode, setAuthMode] = useState<"otp" | "pin" | "qr">("otp")
   const [phone, setPhone] = useState("")
   const [code, setCode] = useState("")
+  const [pin, setPin] = useState("")
   const [challengeId, setChallengeId] = useState<string | null>(null)
   const [devCode, setDevCode] = useState<string | null>(null)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [qrData, setQrData] = useState<{ token: string; qrDataUrl: string } | null>(null)
+
+  // QR Session polling (every 2 seconds when QR mode is active)
+  useEffect(() => {
+    if (authMode !== "qr" || !qrData?.token) return
+    let active = true
+    const interval = setInterval(async () => {
+      try {
+        const res = await apiFetch(`/auth/qr-session/${qrData.token}`)
+        if (res.status === "APPROVED" && res.user && active) {
+          clearInterval(interval)
+          onSuccess(res.user)
+        }
+      } catch {
+        // continue polling
+      }
+    }, 2000)
+    return () => {
+      active = false
+      clearInterval(interval)
+    }
+  }, [authMode, qrData, onSuccess])
 
   const request = async () => {
-    try { setError(""); setLoading(true); const data = await postJson("/auth/request-otp", { phone, role }); setChallengeId(data.challengeId); setDevCode(data.code) }
-    catch (e) { setError((e as Error).message) }
-    finally { setLoading(false) }
-  }
-  const verify = async () => {
     try {
-      setError(""); setLoading(true)
-      const data = await postJson("/auth/verify-otp", { challengeId, code })
+      setError("")
+      setLoading(true)
+      const data = await postJson("/auth/request-otp", { phone, role })
+      setChallengeId(data.challengeId)
+      setDevCode(data.code)
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const verify = async (overrideCode?: string) => {
+    try {
+      setError("")
+      setLoading(true)
+      const submitCode = overrideCode || code
+      const data = await postJson("/auth/verify-otp", { challengeId, code: submitCode })
       onSuccess(data.user)
-    } catch (e) { setError((e as Error).message) }
-    finally { setLoading(false) }
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const verifyPin = async () => {
+    try {
+      setError("")
+      setLoading(true)
+      const data = await postJson("/auth/login-pin", { phone, pin })
+      onSuccess(data.user)
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const initQrSession = async () => {
+    try {
+      setError("")
+      setLoading(true)
+      const data = await postJson("/auth/qr-session")
+      setQrData(data)
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <main className="mx-auto flex max-w-lg flex-col px-4 py-16 sm:px-8">
-      <button onClick={onBack} className="mb-8 text-left text-sm font-semibold text-muted-foreground">← Back</button>
+      <button onClick={onBack} className="mb-6 inline-flex items-center gap-1.5 text-left text-sm font-semibold text-muted-foreground hover:text-foreground">
+        <ArrowLeft className="size-4" /> Back
+      </button>
+
       <div className="rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
-        <Smartphone className="size-9 text-primary" />
-        <h1 className="mt-5 text-3xl font-bold tracking-tight">{role === "DRIVER" ? t("title_driver") : t("title_passenger")}</h1>
-        <p className="mt-3 leading-6 text-muted-foreground">{t("subtitle")}</p>
-        {!challengeId ? (
-          <>
-            <label className="mt-8 block text-sm font-semibold" htmlFor="phone">{t("phone_label")}</label>
-            <input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t("phone_placeholder")} className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3" />
-            <button onClick={request} disabled={loading} className="mt-5 w-full rounded-xl bg-primary px-4 py-3 font-semibold text-primary-foreground disabled:opacity-60">
-              {loading ? t("sending") : t("send_otp")}
-            </button>
-          </>
-        ) : (
-          <>
-            {devCode && <div className="mt-6 rounded-xl bg-primary/10 p-4 text-sm">{t("dev_otp")} <strong className="font-mono">{devCode}</strong></div>}
-            <label className="mt-6 block text-sm font-semibold" htmlFor="otp">{t("otp_label")}</label>
-            <input id="otp" value={code} onChange={(e) => setCode(e.target.value)} inputMode="numeric" maxLength={6} className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 font-mono tracking-[0.3em]" />
-            <button onClick={verify} disabled={loading} className="mt-5 w-full rounded-xl bg-primary px-4 py-3 font-semibold text-primary-foreground disabled:opacity-60">
-              {loading ? t("verifying") : t("verify")}
-            </button>
-          </>
+        <div className="flex items-center justify-between">
+          <div className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            {authMode === "otp" && <Smartphone className="size-6" />}
+            {authMode === "pin" && <Key className="size-6" />}
+            {authMode === "qr" && <QrCode className="size-6" />}
+          </div>
+          <span className="rounded-full bg-muted px-3 py-1 font-mono text-xs font-bold text-muted-foreground">
+            {role}
+          </span>
+        </div>
+
+        <h1 className="mt-5 text-2xl font-bold tracking-tight">
+          {role === "DRIVER" ? t("title_driver") : role === "MANAGER" ? "Manager Access" : role === "ADMIN" ? "Admin Review Login" : t("title_passenger")}
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
+
+        {/* Auth Method Switcher Tabs (SMS OTP vs Backup PIN vs QR) */}
+        <div className="mt-6 grid grid-cols-3 gap-1 rounded-2xl bg-muted p-1 text-xs font-semibold">
+          <button
+            type="button"
+            onClick={() => { setAuthMode("otp"); setError(""); }}
+            className={`rounded-xl py-2 transition-all ${authMode === "otp" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            {t("tab_sms")}
+          </button>
+          <button
+            type="button"
+            onClick={() => { setAuthMode("pin"); setError(""); }}
+            className={`rounded-xl py-2 transition-all ${authMode === "pin" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            {t("tab_pin")}
+          </button>
+          <button
+            type="button"
+            onClick={() => { setAuthMode("qr"); setError(""); if (!qrData) void initQrSession(); }}
+            className={`rounded-xl py-2 transition-all ${authMode === "qr" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            {t("tab_qr")}
+          </button>
+        </div>
+
+        {/* Tab 1: Phone OTP */}
+        {authMode === "otp" && (
+          <div className="mt-6">
+            {!challengeId ? (
+              <>
+                <label className="block text-sm font-semibold" htmlFor="phone">{t("phone_label")}</label>
+                <input
+                  id="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder={t("phone_placeholder")}
+                  className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <button
+                  type="button"
+                  onClick={request}
+                  disabled={loading || !phone.trim()}
+                  className="mt-5 w-full rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60 transition-all hover:bg-primary/90"
+                >
+                  {loading ? t("sending") : t("send_otp")}
+                </button>
+              </>
+            ) : (
+              <>
+                {devCode && (
+                  <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
+                        {t("dev_otp")} <strong className="font-mono text-base">{devCode}</strong>
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => { setCode(devCode); void verify(devCode); }}
+                      className="mt-3 w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-700"
+                    >
+                      <Sparkles className="size-3.5" /> {t("auto_fill_btn")}
+                    </button>
+                  </div>
+                )}
+
+                <label className="mt-5 block text-sm font-semibold" htmlFor="otp">{t("otp_label")}</label>
+                <input
+                  id="otp"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  inputMode="numeric"
+                  maxLength={6}
+                  placeholder="000000"
+                  className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 font-mono text-center text-lg tracking-[0.3em] focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <button
+                  type="button"
+                  onClick={() => verify()}
+                  disabled={loading || code.length < 6}
+                  className="mt-5 w-full rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60 transition-all hover:bg-primary/90"
+                >
+                  {loading ? t("verifying") : t("verify")}
+                </button>
+              </>
+            )}
+          </div>
         )}
-        {error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}
+
+        {/* Tab 2: Driver Backup PIN Fallback */}
+        {authMode === "pin" && (
+          <div className="mt-6 space-y-4">
+            <div>
+              <label className="block text-sm font-semibold" htmlFor="pinPhone">{t("phone_label")}</label>
+              <input
+                id="pinPhone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+251922222222"
+                className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold" htmlFor="pinCode">{t("pin_label")}</label>
+              <input
+                id="pinCode"
+                value={pin}
+                onChange={(e) => setPin(e.target.value)}
+                placeholder={t("pin_placeholder")}
+                className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 font-mono text-sm tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+
+            <div className="rounded-xl bg-muted/60 p-3 text-xs text-muted-foreground">
+              💡 {t("pin_hint")}
+            </div>
+
+            <button
+              type="button"
+              onClick={verifyPin}
+              disabled={loading || !phone.trim() || !pin.trim()}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60 transition-all hover:bg-primary/90"
+            >
+              <Key className="size-4" /> {loading ? "Verifying PIN…" : t("pin_btn")}
+            </button>
+          </div>
+        )}
+
+        {/* Tab 3: QR Code Session Login */}
+        {authMode === "qr" && (
+          <div className="mt-6 flex flex-col items-center text-center">
+            {qrData?.qrDataUrl ? (
+              <>
+                <div className="rounded-2xl border-2 border-border bg-white p-3 shadow-md">
+                  <img src={qrData.qrDataUrl} alt="Login QR Code" className="size-52" />
+                </div>
+                <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                  <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Waiting for scan authorization…</span>
+                </div>
+                <p className="mt-2 max-w-xs text-xs text-muted-foreground">{t("qr_desc")}</p>
+                <button
+                  type="button"
+                  onClick={initQrSession}
+                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                >
+                  <RefreshCw className="size-3" /> Refresh QR code
+                </button>
+              </>
+            ) : (
+              <div className="py-8">
+                <button
+                  type="button"
+                  onClick={initQrSession}
+                  disabled={loading}
+                  className="rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground"
+                >
+                  {loading ? "Generating QR…" : "Generate Sign-in QR"}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {error && (
+          <div className="mt-5 rounded-xl border border-destructive/30 bg-destructive/10 p-3.5 text-xs font-semibold text-destructive">
+            {error}
+          </div>
+        )}
       </div>
     </main>
   )
@@ -1121,16 +1394,264 @@ function DriverDashboard({
   )
 }
 
-// ---------- Admin Driver Verification & KYC Review Portal ----------
+
+// ---------- Manager Operations & Financial Reports Portal ----------
+function ManagerPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout: () => void }) {
+  const [metrics, setMetrics] = useState<ReportMetrics | null>(null)
+  const [transactions, setTransactions] = useState<any[]>([])
+  const [statusFilter, setStatusFilter] = useState<string>("ALL")
+  const [search, setSearch] = useState("")
+  const [loading, setLoading] = useState(true)
+
+  const loadData = async () => {
+    try {
+      setLoading(true)
+      const [reportsData, txData] = await Promise.all([
+        apiFetch("/admin/reports"),
+        apiFetch(`/admin/transactions?status=${statusFilter}&search=${encodeURIComponent(search)}`),
+      ])
+      setMetrics(reportsData.metrics)
+      setTransactions(txData.transactions || [])
+    } catch (e) {
+      console.error("Error loading manager data:", e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    void loadData()
+  }, [statusFilter])
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    void loadData()
+  }
+
+  return (
+    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-8">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+            <BarChart3 className="size-3.5" />
+            <span>Operations & Finance Hub</span>
+          </div>
+          <h1 className="mt-2 text-3xl font-bold">Transit Financial Ledger</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Real-time Addis Ababa minibus fare settlements, platform commission, and transaction logs.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => void loadData()}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2 text-xs font-semibold hover:bg-muted"
+          >
+            <RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh
+          </button>
+          <button
+            onClick={onLogout}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2 text-xs font-semibold hover:bg-muted"
+          >
+            <LogOut className="size-3.5" /> Sign out
+          </button>
+        </div>
+      </div>
+
+      {/* Financial KPIs Grid */}
+      <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Gross Volume</p>
+          <div className="mt-2 flex items-baseline gap-1">
+            <span className="text-2xl font-black text-foreground">{metrics?.grossRevenue ?? 0}</span>
+            <span className="font-mono text-xs font-bold text-emerald-600">ETB</span>
+          </div>
+          <p className="mt-1 text-[11px] text-muted-foreground">Passenger payments</p>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Completed Rides</p>
+          <div className="mt-2 flex items-baseline gap-1">
+            <span className="text-2xl font-black text-foreground">{metrics?.completedRides ?? 0}</span>
+          </div>
+          <p className="mt-1 text-[11px] text-muted-foreground">Verified trips</p>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Platform Fee (2.5%)</p>
+          <div className="mt-2 flex items-baseline gap-1">
+            <span className="text-2xl font-black text-primary">{metrics?.platformCommission ?? 0}</span>
+            <span className="font-mono text-xs font-bold text-primary">ETB</span>
+          </div>
+          <p className="mt-1 text-[11px] text-muted-foreground">Net commission</p>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Driver Net Payout</p>
+          <div className="mt-2 flex items-baseline gap-1">
+            <span className="text-2xl font-black text-emerald-600">{metrics?.driverNetPayouts ?? 0}</span>
+            <span className="font-mono text-xs font-bold text-emerald-600">ETB</span>
+          </div>
+          <p className="mt-1 text-[11px] text-muted-foreground">Disbursed to drivers</p>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Average Fare</p>
+          <div className="mt-2 flex items-baseline gap-1">
+            <span className="text-2xl font-black text-foreground">{metrics?.averageFare ?? 0}</span>
+            <span className="font-mono text-xs font-bold text-muted-foreground">ETB</span>
+          </div>
+          <p className="mt-1 text-[11px] text-muted-foreground">Per completed ride</p>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Active Taxis</p>
+          <div className="mt-2 flex items-baseline gap-1">
+            <span className="text-2xl font-black text-foreground">{metrics?.activeTaxis ?? 0}</span>
+          </div>
+          <p className="mt-1 text-[11px] text-muted-foreground">Deployed QR fleet</p>
+        </div>
+      </div>
+
+      {/* Transaction Ledger */}
+      <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border pb-4">
+          <div>
+            <h2 className="text-base font-bold">Transaction Ledger</h2>
+            <p className="text-xs text-muted-foreground">Filter by payment status or search by taxi ID, plate number, or reference.</p>
+          </div>
+
+          <form onSubmit={handleSearch} className="flex items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-2.5 size-3.5 text-muted-foreground" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search Taxi ID, Plate…"
+                className="rounded-xl border border-border bg-background pl-9 pr-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <button
+              type="submit"
+              className="rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground hover:bg-primary/90"
+            >
+              Filter
+            </button>
+          </form>
+        </div>
+
+        {/* Filter Pills */}
+        <div className="mt-4 flex gap-1.5 text-xs font-semibold">
+          {["ALL", "SUCCESS", "PENDING", "FAILED"].map((st) => (
+            <button
+              key={st}
+              onClick={() => setStatusFilter(st)}
+              className={`rounded-xl px-3 py-1.5 transition-colors ${
+                statusFilter === st
+                  ? "bg-primary text-primary-foreground font-bold"
+                  : "bg-muted text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {st}
+            </button>
+          ))}
+        </div>
+
+        {/* Ledger Table */}
+        <div className="mt-5 overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-border font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                <th className="pb-3 font-semibold">Date & Time</th>
+                <th className="pb-3 font-semibold">Taxi ID</th>
+                <th className="pb-3 font-semibold">Driver & Plate</th>
+                <th className="pb-3 font-semibold">Passenger</th>
+                <th className="pb-3 font-semibold text-right">Amount</th>
+                <th className="pb-3 font-semibold text-center">Status</th>
+                <th className="pb-3 font-semibold text-right">Reference</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {transactions.length > 0 ? (
+                transactions.map((tx) => (
+                  <tr key={tx.id} className="hover:bg-muted/40 transition-colors">
+                    <td className="py-3 font-mono text-[11px] text-muted-foreground">
+                      {new Date(tx.createdAt).toLocaleString([], { dateStyle: "short", timeStyle: "medium" })}
+                    </td>
+                    <td className="py-3 font-mono font-bold text-foreground">
+                      {tx.qr?.taxiId || "TX-N/A"}
+                    </td>
+                    <td className="py-3">
+                      <p className="font-semibold">{tx.driverProfile?.displayName || "Driver"}</p>
+                      <p className="font-mono text-[10px] text-muted-foreground">{tx.driverProfile?.plateNumber || "Plate"}</p>
+                    </td>
+                    <td className="py-3 font-mono text-muted-foreground">
+                      {tx.passengerUser?.phone || "Guest Passenger"}
+                    </td>
+                    <td className="py-3 text-right font-black text-sm">
+                      {tx.amount} <span className="font-normal text-[10px] text-muted-foreground">ETB</span>
+                    </td>
+                    <td className="py-3 text-center">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                          tx.status === "SUCCESS"
+                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"
+                            : tx.status === "FAILED"
+                            ? "bg-destructive/15 text-destructive border border-destructive/30"
+                            : "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
+                        }`}
+                      >
+                        {tx.status}
+                      </span>
+                    </td>
+                    <td className="py-3 text-right font-mono text-[10px] text-muted-foreground">
+                      {tx.addispayTransactionRef ? tx.addispayTransactionRef.slice(0, 12) + "…" : "tx_" + tx.id.slice(0, 8)}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7} className="py-8 text-center text-sm text-muted-foreground">
+                    No transactions match the selected filter.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  )
+}
+
+// ---------- Comprehensive Admin Portal (KYC, User Management, In-App Settings & Reports) ----------
 function AdminPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout: () => void }) {
   const t = useTranslations("admin")
-  const [drivers, setDrivers] = useState<AdminDriver[]>([])
-  const [filter, setFilter] = useState<"ALL" | "PENDING" | "APPROVED" | "REJECTED">("ALL")
-  const [loading, setLoading] = useState(true)
-  const [actionLoading, setActionLoading] = useState<string | null>(null)
-  const [previewDoc, setPreviewDoc] = useState<{ title: string; url: string } | null>(null)
-  const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null)
+  const [adminTab, setAdminTab] = useState<"kyc" | "users" | "settings" | "reports">("kyc")
 
+  // Driver KYC state
+  const [drivers, setDrivers] = useState<AdminDriver[]>([])
+  const [driverFilter, setDriverFilter] = useState<"ALL" | "PENDING" | "APPROVED" | "REJECTED">("ALL")
+  const [previewDoc, setPreviewDoc] = useState<{ title: string; url: string } | null>(null)
+  const [actionLoading, setActionLoading] = useState<string | null>(null)
+
+  // Users state
+  const [users, setUsers] = useState<AdminUser[]>([])
+  const [userRoleFilter, setUserRoleFilter] = useState<string>("ALL")
+  const [userSearch, setUserSearch] = useState("")
+  const [editingUser, setEditingUser] = useState<AdminUser | null>(null)
+  const [editForm, setEditForm] = useState({ name: "", phone: "", role: "PASSENGER" as UserRole, backupCode: "" })
+
+  // Settings state (Live In-App Config without code changes!)
+  const [settings, setSettings] = useState<SystemSetting[]>([])
+  const [settingValues, setSettingValues] = useState<Record<string, string>>({})
+  const [savingSettings, setSavingSettings] = useState(false)
+
+  const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  // Fetch Drivers
   const fetchDrivers = async () => {
     try {
       setLoading(true)
@@ -1143,16 +1664,50 @@ function AdminPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout:
     }
   }
 
+  // Fetch Users
+  const fetchUsers = async () => {
+    try {
+      setLoading(true)
+      const data = await apiFetch(`/admin/users?role=${userRoleFilter}&search=${encodeURIComponent(userSearch)}`)
+      setUsers(data.users || [])
+    } catch (e) {
+      setMessage({ text: (e as Error).message, type: "error" })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Fetch Settings
+  const fetchSettings = async () => {
+    try {
+      setLoading(true)
+      const data = await apiFetch("/admin/settings")
+      const list: SystemSetting[] = data.settings || []
+      setSettings(list)
+      const values: Record<string, string> = {}
+      for (const s of list) {
+        values[s.key] = s.value
+      }
+      setSettingValues(values)
+    } catch (e) {
+      setMessage({ text: (e as Error).message, type: "error" })
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    fetchDrivers()
-  }, [])
+    if (adminTab === "kyc") void fetchDrivers()
+    else if (adminTab === "users") void fetchUsers()
+    else if (adminTab === "settings") void fetchSettings()
+  }, [adminTab, userRoleFilter])
 
   const handleApprove = async (driverId: string) => {
     try {
       setActionLoading(driverId)
       setMessage(null)
       const res = await postJson(`/drivers/${driverId}/approve`)
-      setMessage({ text: `Driver approved! QR Code ${res.qr?.taxiId} created.`, type: "success" })
+      setMessage({ text: `Driver approved! Active Taxi QR Code ${res.qr?.taxiId} created.`, type: "success" })
       await fetchDrivers()
     } catch (e) {
       setMessage({ text: (e as Error).message, type: "error" })
@@ -1175,9 +1730,63 @@ function AdminPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout:
     }
   }
 
+  const startEditUser = (u: AdminUser) => {
+    setEditingUser(u)
+    const activeQr = u.driverProfile?.qrs?.find((q) => q.status === "ACTIVE")
+    setEditForm({
+      name: u.name || "",
+      phone: u.phone,
+      role: u.role,
+      backupCode: activeQr?.backupCode || "ABCD1234",
+    })
+  }
+
+  const saveUserEdits = async () => {
+    if (!editingUser) return
+    try {
+      setActionLoading(editingUser.id)
+      setMessage(null)
+      await putJson(`/admin/users/${editingUser.id}`, {
+        name: editForm.name,
+        phone: editForm.phone,
+        role: editForm.role,
+      })
+      if (editingUser.driverProfile && editForm.backupCode) {
+        await putJson(`/admin/drivers/${editingUser.driverProfile.displayName ? editingUser.driverProfile : editingUser.id}/backup-code`, {
+          backupCode: editForm.backupCode,
+        }).catch(() => {})
+      }
+      setMessage({ text: `User ${editForm.phone} updated successfully!`, type: "success" })
+      setEditingUser(null)
+      await fetchUsers()
+    } catch (e) {
+      setMessage({ text: (e as Error).message, type: "error" })
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      setSavingSettings(true)
+      setMessage(null)
+      const updates: Record<string, { value: string }> = {}
+      for (const [k, v] of Object.entries(settingValues)) {
+        updates[k] = { value: v }
+      }
+      await putJson("/admin/settings", { updates })
+      setMessage({ text: "System settings saved and applied live across backend!", type: "success" })
+    } catch (e) {
+      setMessage({ text: (e as Error).message, type: "error" })
+    } finally {
+      setSavingSettings(false)
+    }
+  }
+
   const filteredDrivers = drivers.filter((d) => {
-    if (filter === "ALL") return true
-    return d.verificationStatus === filter
+    if (driverFilter === "ALL") return true
+    return d.verificationStatus === driverFilter
   })
 
   return (
@@ -1187,18 +1796,24 @@ function AdminPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout:
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
             <ShieldCheck className="size-3.5" />
-            <span>Admin Review Center</span>
+            <span>PayTaxi Control Center</span>
           </div>
-          <h1 className="mt-2 text-3xl font-bold">{t("title")}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
+          <h1 className="mt-2 text-3xl font-bold">Admin Management Console</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Driver KYC verification, user/staff management, live system configurations & financial reports.
+          </p>
         </div>
 
         <div className="flex items-center gap-2">
           <button
-            onClick={fetchDrivers}
+            onClick={() => {
+              if (adminTab === "kyc") void fetchDrivers()
+              else if (adminTab === "users") void fetchUsers()
+              else if (adminTab === "settings") void fetchSettings()
+            }}
             className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2 text-xs font-semibold hover:bg-muted"
           >
-            <RefreshCw className="size-3.5" /> Refresh
+            <RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh
           </button>
           <button
             onClick={onLogout}
@@ -1209,147 +1824,552 @@ function AdminPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout:
         </div>
       </div>
 
-      {/* Toast message */}
+      {/* Main Admin Sub-Tabs */}
+      <div className="mt-6 flex flex-wrap gap-2 border-b border-border pb-4 text-xs font-bold">
+        <button
+          onClick={() => setAdminTab("kyc")}
+          className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 transition-all ${
+            adminTab === "kyc"
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "border border-border bg-card text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Shield className="size-4" /> Driver KYC Review ({drivers.filter((d) => d.verificationStatus === "PENDING").length} pending)
+        </button>
+
+        <button
+          onClick={() => setAdminTab("users")}
+          className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 transition-all ${
+            adminTab === "users"
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "border border-border bg-card text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Users className="size-4" /> User & Staff Profiles
+        </button>
+
+        <button
+          onClick={() => setAdminTab("settings")}
+          className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 transition-all ${
+            adminTab === "settings"
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "border border-border bg-card text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Settings className="size-4" /> System Settings & APIs (No Code Needed)
+        </button>
+
+        <button
+          onClick={() => setAdminTab("reports")}
+          className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 transition-all ${
+            adminTab === "reports"
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "border border-border bg-card text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <BarChart3 className="size-4" /> Financial Reports
+        </button>
+      </div>
+
+      {/* Toast Notification Message */}
       {message && (
-        <div className={`mt-4 rounded-xl p-3.5 text-xs font-semibold ${
-          message.type === "success" ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30" : "bg-destructive/15 text-destructive border border-destructive/30"
-        }`}>
+        <div
+          className={`mt-4 rounded-xl p-3.5 text-xs font-semibold ${
+            message.type === "success"
+              ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30"
+              : "bg-destructive/15 text-destructive border border-destructive/30"
+          }`}
+        >
           {message.text}
         </div>
       )}
 
-      {/* Filter Tabs */}
-      <div className="mt-6 flex flex-wrap gap-2 border-b border-border pb-3">
-        {(["ALL", "PENDING", "APPROVED", "REJECTED"] as const).map((tab) => {
-          const count = tab === "ALL" ? drivers.length : drivers.filter((d) => d.verificationStatus === tab).length
-          const labels: Record<string, string> = {
-            ALL: t("all_tab"),
-            PENDING: t("pending_tab"),
-            APPROVED: t("approved_tab"),
-            REJECTED: t("rejected_tab"),
-          }
-          return (
-            <button
-              key={tab}
-              onClick={() => setFilter(tab)}
-              className={`rounded-xl px-4 py-2 text-xs font-bold transition-colors ${
-                filter === tab
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "border border-border bg-card text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              {labels[tab]} ({count})
-            </button>
-          )
-        })}
-      </div>
+      {/* TAB 1: Driver KYC Verification */}
+      {adminTab === "kyc" && (
+        <div className="mt-6">
+          <div className="flex gap-2 text-xs font-semibold">
+            {(["ALL", "PENDING", "APPROVED", "REJECTED"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setDriverFilter(tab)}
+                className={`rounded-xl px-3.5 py-1.5 transition-colors ${
+                  driverFilter === tab
+                    ? "bg-primary text-primary-foreground font-bold"
+                    : "bg-muted text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {tab === "ALL" ? t("all_tab") : tab === "PENDING" ? t("pending_tab") : tab === "APPROVED" ? t("approved_tab") : t("rejected_tab")}
+              </button>
+            ))}
+          </div>
 
-      {/* Drivers List */}
-      <div className="mt-6 space-y-4">
-        {loading ? (
-          <div className="flex justify-center py-16">
-            <Clock3 className="size-6 animate-spin text-primary" />
-          </div>
-        ) : filteredDrivers.length === 0 ? (
-          <div className="rounded-2xl border border-border bg-card p-12 text-center text-sm text-muted-foreground">
-            {t("no_drivers")}
-          </div>
-        ) : (
-          filteredDrivers.map((driver) => (
-            <div
-              key={driver.id}
-              className="rounded-2xl border border-border bg-card p-5 shadow-sm transition-all hover:border-primary/30"
-            >
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <div className="flex items-center gap-3">
-                    <h3 className="text-lg font-bold text-foreground">{driver.displayName}</h3>
-                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                      driver.verificationStatus === "APPROVED"
-                        ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"
-                        : driver.verificationStatus === "PENDING"
-                        ? "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
-                        : "bg-rose-500/15 text-rose-700 dark:text-rose-400 border border-rose-500/30"
-                    }`}>
-                      {driver.verificationStatus}
-                    </span>
+          <div className="mt-6 grid grid-cols-1 gap-4">
+            {filteredDrivers.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
+                {t("no_drivers")}
+              </div>
+            ) : (
+              filteredDrivers.map((driver) => (
+                <div key={driver.id} className="rounded-2xl border border-border bg-card p-5 shadow-sm transition-all hover:border-primary/40">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-base text-foreground">{driver.displayName}</span>
+                        <span
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                            driver.verificationStatus === "APPROVED"
+                              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+                              : driver.verificationStatus === "PENDING"
+                              ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+                              : "bg-destructive/15 text-destructive"
+                          }`}
+                        >
+                          {driver.verificationStatus}
+                        </span>
+                      </div>
+                      <p className="font-mono text-xs text-muted-foreground">{driver.phone}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {driver.vehicleColor ?? ""} {driver.vehicleMake ?? ""} {driver.vehicleModel ?? ""} · Plate:{" "}
+                        <strong className="font-mono text-foreground">{driver.plateNumber}</strong>
+                      </p>
+                      {driver.activeTaxiId && (
+                        <p className="text-xs font-semibold text-primary">
+                          {t("taxi_assigned")}: <span className="font-mono">{driver.activeTaxiId}</span>
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {driver.verificationStatus !== "APPROVED" && (
+                        <button
+                          onClick={() => handleApprove(driver.id)}
+                          disabled={actionLoading === driver.id}
+                          className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-xs font-bold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+                        >
+                          <CheckCircle className="size-3.5" />
+                          {actionLoading === driver.id ? t("approving") : t("approve_btn")}
+                        </button>
+                      )}
+
+                      {driver.verificationStatus !== "REJECTED" && (
+                        <button
+                          onClick={() => handleReject(driver.id)}
+                          disabled={actionLoading === driver.id}
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs font-bold text-destructive hover:bg-destructive/20 disabled:opacity-60"
+                        >
+                          <XCircle className="size-3.5" />
+                          {actionLoading === driver.id ? t("rejecting") : t("reject_btn")}
+                        </button>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                    <span>Phone: <strong className="font-mono text-foreground">{driver.phone}</strong></span>
-                    <span>Plate: <strong className="font-mono text-foreground">{driver.plateNumber}</strong></span>
-                    <span>Vehicle: <strong className="text-foreground">{driver.vehicleMake} {driver.vehicleModel} ({driver.vehicleColor})</strong></span>
-                    {driver.activeTaxiId && (
-                      <span>Taxi ID: <strong className="font-mono text-primary font-bold">{driver.activeTaxiId}</strong></span>
+                  {/* Document Previews */}
+                  <div className="mt-4 flex flex-wrap gap-3 border-t border-border pt-3">
+                    {driver.nationalIdUrl ? (
+                      <button
+                        onClick={() => setPreviewDoc({ title: `${driver.displayName} - National ID`, url: driver.nationalIdUrl! })}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
+                      >
+                        <Eye className="size-3.5 text-primary" /> {t("id_document")}
+                      </button>
+                    ) : (
+                      <span className="text-[11px] text-muted-foreground italic">No National ID uploaded</span>
+                    )}
+
+                    {driver.licenseUrl ? (
+                      <button
+                        onClick={() => setPreviewDoc({ title: `${driver.displayName} - Driver License`, url: driver.licenseUrl! })}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
+                      >
+                        <Eye className="size-3.5 text-primary" /> {t("license_document")}
+                      </button>
+                    ) : (
+                      <span className="text-[11px] text-muted-foreground italic">No License uploaded</span>
                     )}
                   </div>
                 </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
-                {/* Actions */}
-                <div className="flex flex-wrap items-center gap-2">
-                  {driver.activeTaxiId && (
-                    <a
-                      href={`${API}/qr/${driver.activeTaxiId}.png`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 rounded-xl border border-border bg-muted/60 px-3 py-2 text-xs font-semibold text-foreground hover:bg-muted"
-                    >
-                      <QrCode className="size-3.5 text-primary" /> QR PNG
-                    </a>
-                  )}
+      {/* TAB 2: User & Staff Profiles Management */}
+      {adminTab === "users" && (
+        <div className="mt-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex gap-1.5 text-xs font-semibold">
+              {(["ALL", "PASSENGER", "DRIVER", "MANAGER", "ADMIN"] as const).map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setUserRoleFilter(r)}
+                  className={`rounded-xl px-3 py-1.5 transition-colors ${
+                    userRoleFilter === r
+                      ? "bg-primary text-primary-foreground font-bold"
+                      : "bg-muted text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
 
-                  {driver.verificationStatus !== "APPROVED" && (
-                    <button
-                      onClick={() => handleApprove(driver.id)}
-                      disabled={actionLoading === driver.id}
-                      className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition-opacity hover:opacity-95 disabled:opacity-60"
-                    >
-                      <CheckCircle className="size-3.5" />
-                      {actionLoading === driver.id ? t("approving") : t("approve_btn")}
-                    </button>
-                  )}
+            <div className="relative">
+              <Search className="absolute left-3 top-2.5 size-3.5 text-muted-foreground" />
+              <input
+                value={userSearch}
+                onChange={(e) => setUserSearch(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") void fetchUsers() }}
+                placeholder="Search phone or name…"
+                className="rounded-xl border border-border bg-background pl-9 pr-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+          </div>
 
-                  {driver.verificationStatus !== "REJECTED" && (
-                    <button
-                      onClick={() => handleReject(driver.id)}
-                      disabled={actionLoading === driver.id}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs font-bold text-destructive hover:bg-destructive/20 disabled:opacity-60"
+          <div className="mt-6 overflow-x-auto rounded-2xl border border-border bg-card p-4 shadow-sm">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-border font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                  <th className="pb-3 font-semibold">Phone</th>
+                  <th className="pb-3 font-semibold">Name</th>
+                  <th className="pb-3 font-semibold">Role</th>
+                  <th className="pb-3 font-semibold">Assigned Fleet / Plate</th>
+                  <th className="pb-3 font-semibold">Security PIN</th>
+                  <th className="pb-3 font-semibold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {users.map((u) => {
+                  const activeQr = u.driverProfile?.qrs?.find((q) => q.status === "ACTIVE")
+                  return (
+                    <tr key={u.id} className="hover:bg-muted/40 transition-colors">
+                      <td className="py-3 font-mono font-bold">{u.phone}</td>
+                      <td className="py-3 font-semibold">{u.name || "—"}</td>
+                      <td className="py-3">
+                        <span
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                            u.role === "ADMIN"
+                              ? "bg-purple-500/15 text-purple-700 dark:text-purple-300"
+                              : u.role === "MANAGER"
+                              ? "bg-blue-500/15 text-blue-700 dark:text-blue-300"
+                              : u.role === "DRIVER"
+                              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {u.role}
+                        </span>
+                      </td>
+                      <td className="py-3">
+                        {u.driverProfile ? (
+                          <span>
+                            <strong className="font-mono text-primary">{activeQr?.taxiId || "No QR"}</strong> · {u.driverProfile.plateNumber}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </td>
+                      <td className="py-3 font-mono text-muted-foreground">
+                        {activeQr?.backupCode ? (
+                          <span className="rounded bg-muted px-1.5 py-0.5 font-bold text-foreground">{activeQr.backupCode}</span>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td className="py-3 text-right">
+                        <button
+                          onClick={() => startEditUser(u)}
+                          className="rounded-lg border border-border bg-background px-2.5 py-1 text-xs font-semibold hover:bg-muted"
+                        >
+                          Edit Profile
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Edit User Modal */}
+          {editingUser && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+              <div className="max-w-md w-full rounded-3xl border border-border bg-card p-6 shadow-2xl">
+                <div className="flex items-center justify-between border-b border-border pb-3">
+                  <h4 className="text-base font-bold">Edit User Profile</h4>
+                  <button onClick={() => setEditingUser(null)} className="rounded-lg p-1 hover:bg-muted">
+                    <X className="size-4" />
+                  </button>
+                </div>
+
+                <div className="mt-4 space-y-4 text-xs">
+                  <div>
+                    <label className="block font-semibold">Phone Number</label>
+                    <input
+                      value={editForm.phone}
+                      onChange={(e) => setEditForm((p) => ({ ...p, phone: e.target.value }))}
+                      className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold">Full Name / Display</label>
+                    <input
+                      value={editForm.name}
+                      onChange={(e) => setEditForm((p) => ({ ...p, name: e.target.value }))}
+                      placeholder="e.g. Abebe Bikila"
+                      className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold">User Role & Access</label>
+                    <select
+                      value={editForm.role}
+                      onChange={(e) => setEditForm((p) => ({ ...p, role: e.target.value as UserRole }))}
+                      className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
                     >
-                      <XCircle className="size-3.5" />
-                      {actionLoading === driver.id ? t("rejecting") : t("reject_btn")}
-                    </button>
+                      <option value="PASSENGER">PASSENGER (Standard Commuter)</option>
+                      <option value="DRIVER">DRIVER (Minibus Taxi Driver)</option>
+                      <option value="MANAGER">MANAGER (Operations & Financial Reports)</option>
+                      <option value="ADMIN">ADMIN (Full System Superuser)</option>
+                    </select>
+                  </div>
+
+                  {editForm.role === "DRIVER" && (
+                    <div>
+                      <label className="block font-semibold">Driver Backup Security PIN</label>
+                      <input
+                        value={editForm.backupCode}
+                        onChange={(e) => setEditForm((p) => ({ ...p, backupCode: e.target.value.toUpperCase() }))}
+                        placeholder="e.g. ABCD1234"
+                        className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs uppercase focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                      <p className="mt-1 text-[11px] text-muted-foreground">Used for fallback driver login when SMS is down.</p>
+                    </div>
                   )}
                 </div>
-              </div>
 
-              {/* Document Previews */}
-              <div className="mt-4 flex flex-wrap gap-3 border-t border-border pt-3">
-                {driver.nationalIdUrl ? (
+                <div className="mt-6 flex justify-end gap-2">
                   <button
-                    onClick={() => setPreviewDoc({ title: `${driver.displayName} - National ID`, url: driver.nationalIdUrl! })}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
+                    onClick={() => setEditingUser(null)}
+                    className="rounded-xl border border-border px-4 py-2 text-xs font-semibold hover:bg-muted"
                   >
-                    <Eye className="size-3.5 text-primary" /> {t("id_document")}
+                    Cancel
                   </button>
-                ) : (
-                  <span className="text-[11px] text-muted-foreground italic">No National ID uploaded</span>
-                )}
-
-                {driver.licenseUrl ? (
                   <button
-                    onClick={() => setPreviewDoc({ title: `${driver.displayName} - Driver License`, url: driver.licenseUrl! })}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
+                    onClick={saveUserEdits}
+                    disabled={actionLoading === editingUser.id}
+                    className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
                   >
-                    <Eye className="size-3.5 text-primary" /> {t("license_document")}
+                    {actionLoading === editingUser.id ? "Saving…" : "Save Changes"}
                   </button>
-                ) : (
-                  <span className="text-[11px] text-muted-foreground italic">No License uploaded</span>
-                )}
+                </div>
               </div>
             </div>
-          ))
-        )}
-      </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 3: System Settings & APIs (The Requested Feature: Live In-App Configuration!) */}
+      {adminTab === "settings" && (
+        <form onSubmit={handleSaveSettings} className="mt-6 space-y-6">
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-center gap-2 border-b border-border pb-3">
+              <CreditCard className="size-5 text-primary" />
+              <div>
+                <h3 className="font-bold text-base">Payment Gateway Integration (AddisPay)</h3>
+                <p className="text-xs text-muted-foreground">Configure payment endpoint, merchant credentials, and sandbox simulation.</p>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 text-xs">
+              <div className="sm:col-span-2 flex items-center justify-between rounded-xl bg-muted/50 p-3">
+                <div>
+                  <p className="font-bold text-foreground">Sandbox Simulation Mode</p>
+                  <p className="text-[11px] text-muted-foreground">Allow instant 1-click payment simulation without real birr deduction.</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settingValues["addispay_sandbox_mode"] === "true"}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, addispay_sandbox_mode: e.target.checked ? "true" : "false" }))}
+                  className="size-5 rounded border-border text-primary focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">AddisPay API Key</label>
+                <input
+                  value={settingValues["addispay_api_key"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, addispay_api_key: e.target.value }))}
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">AddisPay Base Gateway URL</label>
+                <input
+                  value={settingValues["addispay_base_url"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, addispay_base_url: e.target.value }))}
+                  placeholder="https://uat.api.addispay.et"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="block font-semibold">AddisPay Webhook Signing Secret</label>
+                <input
+                  value={settingValues["addispay_webhook_secret"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, addispay_webhook_secret: e.target.value }))}
+                  placeholder="sandbox-signature"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* SMS & Alerts Gateway */}
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-center gap-2 border-b border-border pb-3">
+              <Send className="size-5 text-primary" />
+              <div>
+                <h3 className="font-bold text-base">SMS & Telecom Notifications Gateway</h3>
+                <p className="text-xs text-muted-foreground">Select active SMS provider or free Telegram Bot OTP delivery.</p>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 text-xs">
+              <div className="sm:col-span-2">
+                <label className="block font-semibold">Active SMS Provider</label>
+                <select
+                  value={settingValues["sms_gateway_provider"] || "FREE_SANDBOX"}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, sms_gateway_provider: e.target.value }))}
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value="FREE_SANDBOX">FREE_SANDBOX (Instant 1-Click On-Screen OTP — 100% Free)</option>
+                  <option value="TELEGRAM_BOT">TELEGRAM_BOT (Instant Bot OTP via @PayTaxiOtpBot — 100% Free)</option>
+                  <option value="TWILIO">TWILIO (Global SMS Gateway — Free Trial / Paid)</option>
+                  <option value="AFROMESSAGE">AFROMESSAGE (Local Ethiopian Ethio Telecom SMS Gateway)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-semibold">Telegram Bot Token (For 100% Free External OTP)</label>
+                <input
+                  value={settingValues["telegram_bot_token"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, telegram_bot_token: e.target.value }))}
+                  placeholder="e.g. 123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">Telegram Bot Handle</label>
+                <input
+                  value={settingValues["telegram_bot_username"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, telegram_bot_username: e.target.value }))}
+                  placeholder="PayTaxiOtpBot"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">Twilio Account SID (Optional)</label>
+                <input
+                  value={settingValues["twilio_account_sid"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, twilio_account_sid: e.target.value }))}
+                  placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">AfroMessage Ethiopia API Key (Optional)</label>
+                <input
+                  value={settingValues["afromessage_api_key"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, afromessage_api_key: e.target.value }))}
+                  placeholder="afromessage_live_key_..."
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Transit Fares & Platform Rules */}
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-center gap-2 border-b border-border pb-3">
+              <Sliders className="size-5 text-primary" />
+              <div>
+                <h3 className="font-bold text-base">Minibus Transit Fares & Platform Rules</h3>
+                <p className="text-xs text-muted-foreground">Customize minibus stage presets, limits, and platform commission.</p>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3 text-xs">
+              <div className="sm:col-span-3">
+                <label className="block font-semibold">Minibus Stage Presets (ETB, comma-separated)</label>
+                <input
+                  value={settingValues["fare_presets"] || "10, 15, 20, 25, 35, 50"}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, fare_presets: e.target.value }))}
+                  placeholder="10, 15, 20, 25, 35, 50"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">Min Custom Fare (ETB)</label>
+                <input
+                  value={settingValues["min_fare_amount"] || "5"}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, min_fare_amount: e.target.value }))}
+                  type="number"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">Max Custom Fare (ETB)</label>
+                <input
+                  value={settingValues["max_fare_amount"] || "500"}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, max_fare_amount: e.target.value }))}
+                  type="number"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">Platform Fee (%)</label>
+                <input
+                  value={settingValues["platform_fee_percent"] || "2.5"}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, platform_fee_percent: e.target.value }))}
+                  type="number"
+                  step="0.1"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Save Button */}
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={savingSettings}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-60 transition-all"
+            >
+              <Save className="size-4" />
+              {savingSettings ? "Saving Settings Live…" : "Save System Settings Live"}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* TAB 4: Embedded Financial Reports */}
+      {adminTab === "reports" && (
+        <div className="mt-4">
+          <ManagerPortal onRefresh={fetchDrivers} onLogout={onLogout} />
+        </div>
+      )}
 
       {/* Document Preview Modal */}
       {previewDoc && (
@@ -1388,7 +2408,7 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
   const tHome = useTranslations("home")
   const tNav = useTranslations("nav")
   const tTaxi = useTranslations("taxi")
-  const [view, setView] = useState<"loading" | "home" | "auth" | "pay" | "receipt" | "driver-register" | "dashboard" | "admin">("loading")
+  const [view, setView] = useState<"loading" | "home" | "auth" | "pay" | "receipt" | "driver-register" | "dashboard" | "admin" | "manager">("loading")
   const [authRole, setAuthRole] = useState<UserRole>("PASSENGER")
   const [user, setUser] = useState<User | null>(null)
   const [dashboard, setDashboard] = useState<DriverDashboardData | null>(null)
@@ -1410,6 +2430,8 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
         setUser(data.user)
         if (data.user.role === "ADMIN" || data.user.phone === "+251911111111") {
           setView("admin")
+        } else if (data.user.role === "MANAGER" || data.user.phone === "+251944444444") {
+          setView("manager")
         } else if (data.user.role === "DRIVER") {
           return apiFetch("/dashboard").then((d) => { setDashboard(d); setView("dashboard") })
         } else if (initialTaxiId) {
@@ -1448,6 +2470,8 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
     setUser(nextUser)
     if (nextUser.role === "ADMIN" || nextUser.phone === "+251911111111") {
       setView("admin")
+    } else if (nextUser.role === "MANAGER" || nextUser.phone === "+251944444444") {
+      setView("manager")
     } else if (nextUser.role === "DRIVER") {
       void loadDashboard()
     } else {
@@ -1470,6 +2494,7 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
   }
 
   const isAdmin = user?.role === "ADMIN" || user?.phone === "+251911111111"
+  const isManager = user?.role === "MANAGER" || user?.phone === "+251944444444" || isAdmin
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -1500,6 +2525,16 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
                   Driver Dashboard
                 </button>
               )}
+              {isManager && (
+                <button
+                  onClick={() => setView("manager")}
+                  className={`rounded-lg px-2.5 py-1.5 transition-colors ${
+                    view === "manager" ? "bg-primary/10 text-primary font-bold" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Manager Reports
+                </button>
+              )}
               {isAdmin && (
                 <button
                   onClick={() => setView("admin")}
@@ -1507,7 +2542,7 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
                     view === "admin" ? "bg-primary/10 text-primary font-bold" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  Admin Verification
+                  Admin Console
                 </button>
               )}
             </nav>
@@ -1598,12 +2633,18 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
               >
                 {tHome("driver_btn")}
               </button>
-              {/* Dev quick-access for admin testing */}
+              {/* Quick access for Manager and Admin testing */}
+              <button
+                onClick={() => { setAuthRole("MANAGER"); setView("auth") }}
+                className="rounded-xl border border-border/60 bg-muted/30 px-4 py-3.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-muted"
+              >
+                Manager Access
+              </button>
               <button
                 onClick={() => { setAuthRole("ADMIN"); setView("auth") }}
                 className="rounded-xl border border-border/60 bg-muted/30 px-4 py-3.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-muted"
               >
-                Admin Review Login
+                Admin Console
               </button>
             </div>
           </div>
@@ -1645,6 +2686,13 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
         <DriverDashboard
           data={dashboard}
           onRefresh={loadDashboard}
+          onLogout={signOut}
+        />
+      )}
+
+      {view === "manager" && (
+        <ManagerPortal
+          onRefresh={() => {}}
           onLogout={signOut}
         />
       )}

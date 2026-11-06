@@ -124,3 +124,25 @@ model WebhookEvent {
   @@unique([provider, providerEventId])
   @@map("webhook_event")
 }
+
+model SystemSetting {
+  key         String   @id
+  value       String   @db.Text
+  description String?
+  category    String   @default("GENERAL") // PAYMENT | SMS | FARES | SECURITY | GENERAL
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  @@map("system_setting")
+}
+
+model QrLoginSession {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  status    String   @default("PENDING") // PENDING | APPROVED | EXPIRED
+  userId    String?
+  jwtToken  String?  @db.Text
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("qr_login_session")
+}

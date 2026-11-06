@@ -8,6 +8,14 @@ export const metadata: Metadata = {
   title: 'PayTaxi Ethiopia | Safe rides. Simple payments.',
   description: 'Verify your taxi driver and pay your fare securely with PayTaxi and AddisPay.',
   generator: 'v0.app',
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+    apple: [
+      { url: '/icon.svg' },
+    ],
+  },
 }
 
 export const viewport: Viewport = {

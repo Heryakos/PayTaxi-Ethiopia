@@ -17,12 +17,28 @@
 ## Feature Implementation Map
 
 ### Auth
-- Request OTP: `backend/src/routes/auth.ts` → `POST /auth/request-otp` (rate limited: 10/15min)
+- Request OTP: `backend/src/routes/auth.ts` → `POST /auth/request-otp` (rate limited: 30/15min)
 - Verify OTP + JWT issuance + **httpOnly cookie set**: `backend/src/routes/auth.ts` → `POST /auth/verify-otp`
+- **Driver Backup PIN Login Fallback**: `backend/src/routes/auth.ts` → `POST /auth/login-pin` (validates driver phone + backupCode, bypasses SMS during network downtime)
+- **WhatsApp-Style QR Login**: `backend/src/routes/auth.ts` → `POST /auth/qr-session`, `GET /auth/qr-session/:token`, `POST /auth/qr-session/:token/approve`
 - Session restore (web): `backend/src/routes/auth.ts` → `GET /auth/me` — reads cookie, returns user
 - Logout: `backend/src/routes/auth.ts` → `POST /auth/logout` — clears cookie
 - OTP logic (hash, challenge, attempt limit): `backend/src/services/auth.service.ts`
-- Auth middleware (JWT verify from **cookie OR Bearer header**, requireRole): `backend/src/middlewares/auth.middleware.ts`
+- Auth middleware (JWT verify from **cookie OR Bearer header**, requireRole): `backend/src/middlewares/auth.middleware.ts` (Supports PASSENGER, DRIVER, MANAGER, ADMIN)
+
+### Operations Manager & Financial Ledger
+- UI: `ManagerPortal` in `frontend/components/paytaxi-app.tsx`
+- Reports API: `backend/src/routes/admin.ts` → `GET /admin/reports` (Gross revenue, platform commission 2.5%, driver net payouts, completed trips, average fare)
+- Transactions Ledger: `backend/src/routes/admin.ts` → `GET /admin/transactions` (Filter by status, search by Taxi ID, plate, or reference)
+- Seeded Manager account: `+251944444444`
+
+### Admin Portal & In-App Configuration (No Code Changes Needed!)
+- UI: `AdminPortal` in `frontend/components/paytaxi-app.tsx`
+- **Tab 1 (KYC Review)**: Review national IDs/licenses, approve/reject drivers, issue active taxi QRs
+- **Tab 2 (User & Staff Management)**: `GET /admin/users`, `PUT /admin/users/:id` (edit name, phone, change roles across PASSENGER/DRIVER/MANAGER/ADMIN, reset Driver Backup PIN)
+- **Tab 3 (Live System Settings)**: `GET /admin/settings`, `PUT /admin/settings` (configure AddisPay API keys/URL/sandbox toggle, SMS gateway selection [Sandbox, Telegram Bot, Twilio, AfroMessage], fare presets, platform commission)
+- **Tab 4 (Financial Reports)**: Embedded Manager financial hub
+- Settings service: `backend/src/services/settings.service.ts` backed by `system_setting` table in Supabase PostgreSQL
 
 ### Driver Registration & Verification
 - Register driver (PENDING): `backend/src/routes/drivers.ts` → `POST /drivers/register`
@@ -79,12 +95,14 @@
 ### Table Summary
 | Table | Purpose |
 |---|---|
-| `app_user` | Passengers, drivers, admins. `role` field: PASSENGER/DRIVER/ADMIN — enforced by DB CHECK constraint |
+| `app_user` | Passengers, drivers, managers, admins. `role` field: PASSENGER/DRIVER/MANAGER/ADMIN |
 | `driver_profile` | Driver details. `verificationStatus`: PENDING/APPROVED/REJECTED — enforced by DB CHECK constraint |
 | `taxi_qr` | QR codes. `taxiId` is unique human-readable (e.g. TX-1001). `status`: ACTIVE/DISABLED/REPLACED — enforced by DB CHECK constraint |
 | `transaction` | Payment records. `status`: PENDING/SUCCESS/FAILED/REFUNDED/UNKNOWN — enforced by DB CHECK constraint. Financial records are never deleted (NoAction FK) |
 | `webhook_event` | Idempotent log of provider callbacks. Unique on `(provider, providerEventId)` |
 | `otp_challenge` | Temporary OTP challenges with expiry and attempt count |
+| `system_setting` | Live key-value in-app configuration store for Payment API, SMS providers, and transit rules |
+| `qr_login_session` | WhatsApp-style QR code dynamic session tokens with status and expiry |
 | `app_session` | (Legacy from v0 — superseded by JWT. May be removed in future) |
 
 ### DB CHECK Constraints

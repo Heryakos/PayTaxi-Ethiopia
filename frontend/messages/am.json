@@ -10,7 +10,17 @@
     "otp_label": "6-ሃሳቤ ኮድ",
     "verify": "አረጋግጥ እና ቀጥል",
     "verifying": "እያረጋገጠ…",
-    "dev_otp": "Dev OTP:"
+    "dev_otp": "Dev OTP:",
+    "tab_sms": "📱 ስልክ OTP",
+    "tab_pin": "🔑 የሹፌር መጠባበቂያ ፒን",
+    "tab_qr": "📷 QR ኮድ መግቢያ",
+    "pin_label": "የሹፌር ደህንነት ፒን ኮድ",
+    "pin_placeholder": "ምሳሌ፡ ABCD1234",
+    "pin_btn": "በፒን ይግቡ",
+    "pin_hint": "የሙከራ ሹፌር ፒን፡ ABCD1234 (ያለ SMS ፈጣን መግቢያ)",
+    "auto_fill_btn": "⚡ በ1-ጠቅታ ሙሉ እና ግባ",
+    "qr_title": "በQR ኮድ ይግቡ",
+    "qr_desc": "የዚህን ማሰሻ ፈቃድ ለማረጋገጥ ይህንን QR ኮድ በሌላ መሣሪያ ይቃኙ።"
   },
   "registration": {
     "label": "የሹፌር ምዝገባ",
@@ -101,7 +111,9 @@
     "pay_btn": "ታክሲ ክፈል",
     "driver_btn": "የሹፌር ምዝገባ",
     "passenger_login": "የተሳፋሪ ግቤት",
-    "driver_portal": "የሹፌር ፖርታል"
+    "driver_portal": "የሹፌር ፖርታል",
+    "manager_login": "የማናጀር ሪፖርት",
+    "admin_login": "የአድሚን ኮንሶል"
   },
   "nav": {
     "brand_name": "PAYTAXI",

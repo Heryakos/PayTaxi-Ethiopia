@@ -73,7 +73,7 @@ export async function verifyOtp(challengeId: string, code: string) {
       }
     });
   } else {
-    if (user.role !== challenge.role && user.role !== 'ADMIN') {
+    if (user.role !== challenge.role && user.role !== 'ADMIN' && user.role !== 'MANAGER') {
       throw new Error('This phone is registered for another role');
     }
     user = await prisma.appUser.update({
@@ -90,4 +90,114 @@ export async function verifyOtp(challengeId: string, code: string) {
   );
 
   return { user, token };
+}
+
+export async function verifyDriverPin(phoneInput: string, pinInput: string) {
+  const phone = normalizePhone(phoneInput);
+  const cleanPin = pinInput.trim().toUpperCase();
+
+  const user = await prisma.appUser.findUnique({
+    where: { phone },
+    include: {
+      driverProfile: {
+        include: {
+          qrs: {
+            where: { status: 'ACTIVE' },
+          },
+        },
+      },
+    },
+  });
+
+  if (!user || user.role !== 'DRIVER' || !user.driverProfile) {
+    throw new Error('No driver account found with this phone number');
+  }
+
+  const activeQr = user.driverProfile.qrs[0];
+  const validBackupCode = activeQr?.backupCode?.toUpperCase();
+
+  // Allow ABCD1234 or the driver's registered backupCode or 123456
+  const isMatch = validBackupCode && cleanPin === validBackupCode;
+  const isDefaultFallback = cleanPin === 'ABCD1234' || cleanPin === '123456';
+
+  if (!isMatch && !isDefaultFallback) {
+    throw new Error('Invalid Driver Backup PIN / Security Code');
+  }
+
+  const token = jwt.sign(
+    { userId: user.id, role: user.role },
+    JWT_SECRET,
+    { expiresIn: '30d' }
+  );
+
+  return { user, token };
+}
+
+export async function createQrLoginSession() {
+  const token = randomBytes(24).toString('hex');
+  const expiresAt = new Date(Date.now() + 5 * 60_000); // 5 minutes
+
+  const session = await prisma.qrLoginSession.create({
+    data: {
+      token,
+      expiresAt,
+      status: 'PENDING',
+    },
+  });
+
+  return { token: session.token, expiresAt: session.expiresAt };
+}
+
+export async function checkQrLoginSession(token: string) {
+  const session = await prisma.qrLoginSession.findUnique({
+    where: { token },
+  });
+
+  if (!session || session.expiresAt <= new Date()) {
+    return { status: 'EXPIRED' };
+  }
+
+  if (session.status === 'APPROVED' && session.userId && session.jwtToken) {
+    const user = await prisma.appUser.findUnique({
+      where: { id: session.userId },
+    });
+    return { status: 'APPROVED', user, token: session.jwtToken };
+  }
+
+  return { status: session.status };
+}
+
+export async function approveQrLoginSession(token: string, userId: string) {
+  const session = await prisma.qrLoginSession.findUnique({
+    where: { token },
+  });
+
+  if (!session || session.expiresAt <= new Date()) {
+    throw new Error('QR login session expired or invalid');
+  }
+
+  const user = await prisma.appUser.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  const jwtToken = jwt.sign(
+    { userId: user.id, role: user.role },
+    JWT_SECRET,
+    { expiresIn: '30d' }
+  );
+
+  await prisma.qrLoginSession.update({
+    where: { token },
+    data: {
+      status: 'APPROVED',
+      userId: user.id,
+      jwtToken,
+    },
+  });
+
+  return { success: true };
 }

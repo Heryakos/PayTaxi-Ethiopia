@@ -10,7 +10,17 @@
     "otp_label": "6-digit code",
     "verify": "Verify and continue",
     "verifying": "Verifying…",
-    "dev_otp": "Dev OTP:"
+    "dev_otp": "Dev OTP:",
+    "tab_sms": "📱 Phone OTP",
+    "tab_pin": "🔑 Driver Backup PIN",
+    "tab_qr": "📷 QR Code Login",
+    "pin_label": "Driver Backup Security PIN / Code",
+    "pin_placeholder": "e.g. ABCD1234",
+    "pin_btn": "Sign in with Driver PIN",
+    "pin_hint": "Seed driver test PIN: ABCD1234 (Instant sign-in without SMS)",
+    "auto_fill_btn": "⚡ 1-Click Auto-Fill & Sign In",
+    "qr_title": "Scan to Sign In",
+    "qr_desc": "Scan this QR code with a signed-in device to authorize this browser session."
   },
   "registration": {
     "label": "Driver registration",
@@ -101,7 +111,9 @@
     "pay_btn": "Pay a taxi",
     "driver_btn": "Driver registration",
     "passenger_login": "Passenger login",
-    "driver_portal": "Driver portal"
+    "driver_portal": "Driver portal",
+    "manager_login": "Manager Reports",
+    "admin_login": "Admin Console"
   },
   "nav": {
     "brand_name": "PAYTAXI",
