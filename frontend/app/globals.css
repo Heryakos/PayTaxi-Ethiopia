@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
@@ -30,30 +31,56 @@
 }
 
 :root {
-  color-scheme: light;
-  --background: oklch(0.975 0.012 105);
-  --foreground: oklch(0.23 0.035 165);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.23 0.035 165);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.23 0.035 165);
-  --primary: oklch(0.39 0.1 164);
-  --primary-foreground: oklch(0.98 0.01 105);
-  --secondary: oklch(0.93 0.025 104);
-  --secondary-foreground: oklch(0.28 0.04 165);
-  --muted: oklch(0.95 0.018 105);
-  --muted-foreground: oklch(0.5 0.035 165);
-  --accent: oklch(0.78 0.14 83);
-  --accent-foreground: oklch(0.25 0.05 80);
-  --destructive: oklch(0.58 0.2 25);
-  --border: oklch(0.88 0.025 105);
-  --input: oklch(0.88 0.025 105);
-  --ring: oklch(0.55 0.12 164);
-  --radius: 0.7rem;
+  color-scheme: dark;
+  --background: #061412;
+  --foreground: #f8fafc;
+  --card: #0b2420;
+  --card-foreground: #f8fafc;
+  --popover: #0b2420;
+  --popover-foreground: #f8fafc;
+  --primary: #00a878;
+  --primary-foreground: #ffffff;
+  --secondary: #133832;
+  --secondary-foreground: #a7f3d0;
+  --muted: #0d2d27;
+  --muted-foreground: #94a3b8;
+  --accent: #f59e0b;
+  --accent-foreground: #000000;
+  --destructive: #ef4444;
+  --border: rgba(0, 168, 120, 0.22);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #00a878;
+  --radius: 0.85rem;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #061412;
+  --foreground: #f8fafc;
+  --card: #0b2420;
+  --card-foreground: #f8fafc;
+  --popover: #0b2420;
+  --popover-foreground: #f8fafc;
+  --primary: #00a878;
+  --primary-foreground: #ffffff;
+  --secondary: #133832;
+  --secondary-foreground: #a7f3d0;
+  --muted: #0d2d27;
+  --muted-foreground: #94a3b8;
+  --accent: #f59e0b;
+  --accent-foreground: #000000;
+  --destructive: #ef4444;
+  --border: rgba(0, 168, 120, 0.22);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #00a878;
+  --radius: 0.85rem;
 }
 
 @layer base {
   * { @apply border-border outline-ring/50; }
-  body { @apply bg-background text-foreground; font-family: Arial, Helvetica, sans-serif; }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
   button, a { -webkit-tap-highlight-color: transparent; }
 }

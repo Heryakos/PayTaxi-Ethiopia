@@ -19,8 +19,8 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: '#f7f8f5',
+  colorScheme: 'dark',
+  themeColor: '#061412',
   userScalable: true,
 }
 
@@ -29,8 +29,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className="bg-background" suppressHydrationWarning>
-      <body className="antialiased">
+    <html lang={locale} className="dark bg-[#061412] text-slate-100" suppressHydrationWarning>
+      <body className="antialiased min-h-screen bg-[#061412] text-slate-100">
         <NextIntlClientProvider messages={messages}>
           {children}
         </NextIntlClientProvider>

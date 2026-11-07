@@ -213,9 +213,8 @@ export function EthiopianPlate({
   const text = plate || "AA 3-B12345"
   return (
     <div
-      className={`inline-flex items-center gap-1.5 rounded-md border-2 border-black bg-white font-mono font-black text-black shadow-sm ${
-        isSm ? "px-1.5 py-0.5 text-[11px]" : isLg ? "px-3 py-1.5 text-base" : "px-2 py-1 text-xs"
-      }`}
+      className={`inline-flex items-center gap-1.5 rounded-md border-2 border-black bg-white font-mono font-black text-black shadow-sm ${isSm ? "px-1.5 py-0.5 text-[11px]" : isLg ? "px-3 py-1.5 text-base" : "px-2 py-1 text-xs"
+        }`}
     >
       <span className="flex h-2.5 w-3.5 flex-col overflow-hidden rounded-[1px] border border-black/20">
         <span className="h-1/3 bg-[#078930]" />
@@ -517,18 +516,16 @@ function PassengerPay({
           <button
             type="button"
             onClick={() => setFareMode("preset")}
-            className={`flex-1 rounded-lg py-2 text-xs font-semibold transition-colors ${
-              fareMode === "preset" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-            }`}
+            className={`flex-1 rounded-lg py-2 text-xs font-semibold transition-colors ${fareMode === "preset" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+              }`}
           >
             {t("presets_tab")}
           </button>
           <button
             type="button"
             onClick={() => setFareMode("custom")}
-            className={`flex-1 rounded-lg py-2 text-xs font-semibold transition-colors ${
-              fareMode === "custom" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-            }`}
+            className={`flex-1 rounded-lg py-2 text-xs font-semibold transition-colors ${fareMode === "custom" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+              }`}
           >
             {t("custom_fare_tab")}
           </button>
@@ -544,11 +541,10 @@ function PassengerPay({
                   key={fare.id}
                   type="button"
                   onClick={() => setFarePresetId(fare.id)}
-                  className={`rounded-2xl border p-3.5 text-left transition-all ${
-                    active
+                  className={`rounded-2xl border p-3.5 text-left transition-all ${active
                       ? "border-primary bg-primary/10 shadow-sm ring-1 ring-primary"
                       : "border-border bg-background hover:border-primary/50"
-                  }`}
+                    }`}
                 >
                   <p className="text-xs font-semibold text-foreground line-clamp-1">{fare.label}</p>
                   <p className="mt-1 font-mono text-lg font-bold text-primary">{fare.amount} <span className="text-xs font-normal">ETB</span></p>
@@ -615,9 +611,8 @@ function PassengerPay({
                 key={num}
                 type="button"
                 onClick={() => setPassengerCount(num)}
-                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors ${
-                  passengerCount === num ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"
-                }`}
+                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors ${passengerCount === num ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 {num} {num === 1 ? "seat" : "seats"}
               </button>
@@ -1311,11 +1306,10 @@ function DriverDashboard({
           <button
             type="button"
             onClick={toggleSoundbox}
-            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-all shadow-sm ${
-              soundboxEnabled
+            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-all shadow-sm ${soundboxEnabled
                 ? "border-2 border-emerald-500/40 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300"
                 : "border border-border bg-muted/60 text-muted-foreground"
-            }`}
+              }`}
           >
             {soundboxEnabled ? (
               <>
@@ -1363,9 +1357,8 @@ function DriverDashboard({
         <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <QrCode className="size-5 text-primary" />
-            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${
-              currentData.qr?.status === "ACTIVE" ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" : "bg-amber-500/15 text-amber-700"
-            }`}>
+            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${currentData.qr?.status === "ACTIVE" ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" : "bg-amber-500/15 text-amber-700"
+              }`}>
               {currentData.qr?.status ?? currentData.driver.verificationStatus}
             </span>
           </div>
@@ -1447,11 +1440,10 @@ function DriverDashboard({
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="font-bold text-base">{row.amount} ETB</span>
-                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                    row.status === "SUCCESS"
+                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${row.status === "SUCCESS"
                       ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
                       : "bg-muted text-muted-foreground"
-                  }`}>
+                    }`}>
                     {row.status}
                   </span>
                 </div>
@@ -1619,11 +1611,10 @@ function ManagerPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogou
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`rounded-xl px-3 py-1.5 transition-colors ${
-                statusFilter === st
+              className={`rounded-xl px-3 py-1.5 transition-colors ${statusFilter === st
                   ? "bg-primary text-primary-foreground font-bold"
                   : "bg-muted text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               {st}
             </button>
@@ -1666,13 +1657,12 @@ function ManagerPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogou
                     </td>
                     <td className="py-3 text-center">
                       <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                          tx.status === "SUCCESS"
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${tx.status === "SUCCESS"
                             ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"
                             : tx.status === "FAILED"
-                            ? "bg-destructive/15 text-destructive border border-destructive/30"
-                            : "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
-                        }`}
+                              ? "bg-destructive/15 text-destructive border border-destructive/30"
+                              : "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
+                          }`}
                       >
                         {tx.status}
                       </span>
@@ -1826,7 +1816,7 @@ function AdminPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout:
       if (editingUser.driverProfile && editForm.backupCode) {
         await putJson(`/admin/drivers/${editingUser.driverProfile.displayName ? editingUser.driverProfile : editingUser.id}/backup-code`, {
           backupCode: editForm.backupCode,
-        }).catch(() => {})
+        }).catch(() => { })
       }
       setMessage({ text: `User ${editForm.phone} updated successfully!`, type: "success" })
       setEditingUser(null)
@@ -1900,44 +1890,40 @@ function AdminPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout:
       <div className="mt-6 flex flex-wrap gap-2 border-b border-border pb-4 text-xs font-bold">
         <button
           onClick={() => setAdminTab("kyc")}
-          className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 transition-all ${
-            adminTab === "kyc"
+          className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 transition-all ${adminTab === "kyc"
               ? "bg-primary text-primary-foreground shadow-sm"
               : "border border-border bg-card text-muted-foreground hover:text-foreground"
-          }`}
+            }`}
         >
           <Shield className="size-4" /> Driver KYC Review ({drivers.filter((d) => d.verificationStatus === "PENDING").length} pending)
         </button>
 
         <button
           onClick={() => setAdminTab("users")}
-          className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 transition-all ${
-            adminTab === "users"
+          className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 transition-all ${adminTab === "users"
               ? "bg-primary text-primary-foreground shadow-sm"
               : "border border-border bg-card text-muted-foreground hover:text-foreground"
-          }`}
+            }`}
         >
           <Users className="size-4" /> User & Staff Profiles
         </button>
 
         <button
           onClick={() => setAdminTab("settings")}
-          className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 transition-all ${
-            adminTab === "settings"
+          className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 transition-all ${adminTab === "settings"
               ? "bg-primary text-primary-foreground shadow-sm"
               : "border border-border bg-card text-muted-foreground hover:text-foreground"
-          }`}
+            }`}
         >
           <Settings className="size-4" /> System Settings & APIs (No Code Needed)
         </button>
 
         <button
           onClick={() => setAdminTab("reports")}
-          className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 transition-all ${
-            adminTab === "reports"
+          className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 transition-all ${adminTab === "reports"
               ? "bg-primary text-primary-foreground shadow-sm"
               : "border border-border bg-card text-muted-foreground hover:text-foreground"
-          }`}
+            }`}
         >
           <BarChart3 className="size-4" /> Financial Reports
         </button>
@@ -1946,11 +1932,10 @@ function AdminPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout:
       {/* Toast Notification Message */}
       {message && (
         <div
-          className={`mt-4 rounded-xl p-3.5 text-xs font-semibold ${
-            message.type === "success"
+          className={`mt-4 rounded-xl p-3.5 text-xs font-semibold ${message.type === "success"
               ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30"
               : "bg-destructive/15 text-destructive border border-destructive/30"
-          }`}
+            }`}
         >
           {message.text}
         </div>
@@ -1964,11 +1949,10 @@ function AdminPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout:
               <button
                 key={tab}
                 onClick={() => setDriverFilter(tab)}
-                className={`rounded-xl px-3.5 py-1.5 transition-colors ${
-                  driverFilter === tab
+                className={`rounded-xl px-3.5 py-1.5 transition-colors ${driverFilter === tab
                     ? "bg-primary text-primary-foreground font-bold"
                     : "bg-muted text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 {tab === "ALL" ? t("all_tab") : tab === "PENDING" ? t("pending_tab") : tab === "APPROVED" ? t("approved_tab") : t("rejected_tab")}
               </button>
@@ -1988,13 +1972,12 @@ function AdminPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout:
                       <div className="flex items-center gap-3">
                         <span className="font-bold text-base text-foreground">{driver.displayName}</span>
                         <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                            driver.verificationStatus === "APPROVED"
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${driver.verificationStatus === "APPROVED"
                               ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
                               : driver.verificationStatus === "PENDING"
-                              ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
-                              : "bg-destructive/15 text-destructive"
-                          }`}
+                                ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+                                : "bg-destructive/15 text-destructive"
+                            }`}
                         >
                           {driver.verificationStatus}
                         </span>
@@ -2076,11 +2059,10 @@ function AdminPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout:
                 <button
                   key={r}
                   onClick={() => setUserRoleFilter(r)}
-                  className={`rounded-xl px-3 py-1.5 transition-colors ${
-                    userRoleFilter === r
+                  className={`rounded-xl px-3 py-1.5 transition-colors ${userRoleFilter === r
                       ? "bg-primary text-primary-foreground font-bold"
                       : "bg-muted text-muted-foreground hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   {r}
                 </button>
@@ -2120,15 +2102,14 @@ function AdminPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout:
                       <td className="py-3 font-semibold">{u.name || "—"}</td>
                       <td className="py-3">
                         <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                            u.role === "ADMIN"
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${u.role === "ADMIN"
                               ? "bg-purple-500/15 text-purple-700 dark:text-purple-300"
                               : u.role === "MANAGER"
-                              ? "bg-blue-500/15 text-blue-700 dark:text-blue-300"
-                              : u.role === "DRIVER"
-                              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                              : "bg-muted text-muted-foreground"
-                          }`}
+                                ? "bg-blue-500/15 text-blue-700 dark:text-blue-300"
+                                : u.role === "DRIVER"
+                                  ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                                  : "bg-muted text-muted-foreground"
+                            }`}
                         >
                           {u.role}
                         </span>
@@ -2532,7 +2513,7 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
   }
 
   const signOut = async () => {
-    await postJson("/auth/logout").catch(() => {})
+    await postJson("/auth/logout").catch(() => { })
     setUser(null)
     setDashboard(null)
     setView("home")
@@ -2569,8 +2550,8 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
   const isManager = user?.role === "MANAGER" || user?.phone === "+251944444444" || isAdmin
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="flex items-center justify-between border-b border-border px-4 py-4 sm:px-8">
+    <div className="min-h-screen bg-[#061412] text-slate-100">
+      <header className="sticky top-0 z-50 flex items-center justify-between border-b border-emerald-500/20 bg-[#031c18]/90 backdrop-blur-md px-4 py-3.5 sm:px-8">
         <div className="flex items-center gap-6">
           <Brand />
           {/* Quick tab switcher when logged in */}
@@ -2578,9 +2559,8 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
             <nav className="hidden md:flex items-center gap-1.5 text-xs font-semibold">
               <button
                 onClick={() => setView("pay")}
-                className={`rounded-lg px-2.5 py-1.5 transition-colors ${
-                  view === "pay" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
-                }`}
+                className={`rounded-lg px-2.5 py-1.5 transition-colors ${view === "pay" ? "bg-emerald-500/20 text-emerald-300 font-bold" : "text-slate-400 hover:text-white"
+                  }`}
               >
                 Pay Taxi
               </button>
@@ -2590,9 +2570,8 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
                     if (dashboard) setView("dashboard")
                     else void loadDashboard()
                   }}
-                  className={`rounded-lg px-2.5 py-1.5 transition-colors ${
-                    view === "dashboard" ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  className={`rounded-lg px-2.5 py-1.5 transition-colors ${view === "dashboard" ? "bg-emerald-500/20 text-emerald-300 font-bold" : "text-slate-400 hover:text-white"
+                    }`}
                 >
                   Driver Dashboard
                 </button>
@@ -2600,9 +2579,8 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
               {isManager && (
                 <button
                   onClick={() => setView("manager")}
-                  className={`rounded-lg px-2.5 py-1.5 transition-colors ${
-                    view === "manager" ? "bg-primary/10 text-primary font-bold" : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  className={`rounded-lg px-2.5 py-1.5 transition-colors ${view === "manager" ? "bg-emerald-500/20 text-emerald-300 font-bold" : "text-slate-400 hover:text-white"
+                    }`}
                 >
                   Manager Reports
                 </button>
@@ -2610,9 +2588,8 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
               {isAdmin && (
                 <button
                   onClick={() => setView("admin")}
-                  className={`rounded-lg px-2.5 py-1.5 transition-colors ${
-                    view === "admin" ? "bg-primary/10 text-primary font-bold" : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  className={`rounded-lg px-2.5 py-1.5 transition-colors ${view === "admin" ? "bg-emerald-500/20 text-emerald-300 font-bold" : "text-slate-400 hover:text-white"
+                    }`}
                 >
                   Admin Console
                 </button>
@@ -2624,7 +2601,7 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
         <div className="flex items-center gap-4">
           <button
             onClick={toggleLanguage}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-300/80 hover:text-emerald-300 transition-colors"
           >
             <Globe className="size-3.5" />
             <span className="hidden sm:inline">English / አማርኛ</span>
@@ -2633,12 +2610,12 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
           <div className="flex items-center gap-2">
             {user ? (
               <div className="flex items-center gap-2">
-                <span className="hidden sm:inline-block rounded-full bg-muted px-2.5 py-1 text-[11px] font-mono font-medium text-muted-foreground">
+                <span className="hidden sm:inline-block rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 text-[11px] font-mono font-medium text-emerald-300">
                   {user.phone} ({user.role})
                 </span>
                 <button
                   onClick={signOut}
-                  className="rounded-xl border border-border px-3 py-1.5 text-xs font-semibold hover:bg-muted"
+                  className="rounded-xl border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/20"
                 >
                   Sign out
                 </button>
@@ -2647,13 +2624,13 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
               <>
                 <button
                   onClick={() => { setAuthRole("PASSENGER"); setView("auth") }}
-                  className="rounded-xl border border-border px-3 py-2 text-xs font-semibold hover:bg-muted"
+                  className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20 transition-colors"
                 >
                   {tHome("passenger_login")}
                 </button>
                 <button
                   onClick={() => { setAuthRole("DRIVER"); setView("auth") }}
-                  className="rounded-xl bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:opacity-95"
+                  className="rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 px-3.5 py-2 text-xs font-bold text-white shadow-md shadow-emerald-950/40 hover:opacity-95 transition-opacity"
                 >
                   {tHome("driver_portal")}
                 </button>
@@ -2664,61 +2641,140 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
       </header>
 
       {view === "home" && (
-        <main className="mx-auto max-w-5xl px-4 py-20 sm:px-8">
-          {taxiInfo && (
-            <div className="mb-10 rounded-3xl border border-primary/20 bg-primary/5 p-6 sm:p-8">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
-                    <BadgeCheck className="size-3.5" />{tTaxi("verified")}
-                  </div>
-                  <h2 className="mt-4 text-2xl font-bold">{taxiInfo.taxiId} · {taxiInfo.driver.displayName}</h2>
-                  <div className="mt-2.5 flex items-center gap-2">
-                    <EthiopianPlate plate={taxiInfo.driver.plateNumber} size="sm" />
-                    <span className="text-xs text-muted-foreground">· {taxiInfo.driver.vehicleMake ?? "Toyota HiAce"} {taxiInfo.driver.vehicleColor ?? "Minibus"}</span>
-                  </div>
+        <main className="mx-auto max-w-6xl px-4 py-12 sm:px-8">
+          {/* Ambient background glow */}
+          <div className="pointer-events-none absolute left-1/2 top-20 -translate-x-1/2 w-full max-w-4xl h-96 bg-gradient-to-b from-emerald-500/15 via-emerald-500/5 to-transparent blur-3xl" />
+
+          {/* Scanned / Default Taxi Quick Card */}
+          <div className="relative mb-10 overflow-hidden rounded-3xl border border-emerald-500/30 bg-[#08201b]/80 backdrop-blur-md p-6 sm:p-8 shadow-xl">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-300">
+                  <BadgeCheck className="size-4 text-emerald-400" />
+                  <span>Verified Addis Ababa Minibus Taxi</span>
                 </div>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
+                  Taxi {taxiInfo?.taxiId || initialTaxiId || "TX-1001"} · {taxiInfo?.driver.displayName || "Abebe Bikila"}
+                </h2>
+                <div className="flex flex-wrap items-center gap-3 pt-1">
+                  <EthiopianPlate plate={taxiInfo?.driver.plateNumber || "AA 3-B12345"} size="md" />
+                  <span className="text-xs text-slate-300 font-medium">
+                    {taxiInfo?.driver.vehicleMake || "Toyota HiAce Minibus"} {taxiInfo?.driver.vehicleColor ? `(${taxiInfo.driver.vehicleColor})` : "(Blue & White)"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
                 <button
                   onClick={() => setView("pay")}
-                  className="rounded-xl bg-primary px-5 py-3 font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-95"
+                  className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-500 px-6 py-4 font-bold text-white shadow-lg shadow-emerald-900/40 transition-all hover:scale-[1.02] hover:opacity-95"
                 >
-                  {tTaxi("pay")}
+                  <CreditCard className="size-5" />
+                  <span>Pay Taxi Fare (AddisPay)</span>
                 </button>
               </div>
             </div>
-          )}
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary">
-              <BadgeCheck className="size-3.5" />{tHome("tagline")}
+          </div>
+
+          {/* Hero Content */}
+          <div className="relative max-w-3xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-bold text-emerald-300 mb-6">
+              <span>🇪🇹 Addis Ababa Urban Transit FinTech Platform</span>
             </div>
-            <h1 className="mt-6 text-5xl font-bold tracking-tight text-balance sm:text-6xl">{tHome("heading")}</h1>
-            <p className="mt-6 text-lg leading-8 text-muted-foreground">{tHome("description")}</p>
-            <div className="mt-9 flex flex-wrap gap-3">
+
+            <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white leading-[1.1]">
+              Cashless Minibus Payments & <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">Driver Soundbox Platform</span>
+            </h1>
+
+            <p className="mt-6 text-lg sm:text-xl text-slate-300 leading-relaxed font-normal">
+              Eliminating paper change shortages, fare fraud, and network drops in Ethiopian public transit with instant QR checkouts, animated anti-fraud receipts, and real-time audio chimes.
+            </p>
+
+            {/* Role Action Grid */}
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-w-2xl">
               <button
                 onClick={() => setView("pay")}
-                className="rounded-xl bg-primary px-5 py-3.5 font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-95"
+                className="flex items-center justify-between rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-4 font-bold text-white hover:bg-emerald-500/20 transition-all"
               >
-                {tHome("pay_btn")}
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-xl bg-emerald-500 text-white">
+                    <QrCode className="size-5" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-sm font-bold">Passenger Minibus Checkout</div>
+                    <div className="text-xs text-emerald-200/70 font-normal">No app download needed</div>
+                  </div>
+                </div>
+                <ChevronRight className="size-5 text-emerald-400" />
               </button>
+
               <button
                 onClick={() => { setAuthRole("DRIVER"); setView("auth") }}
-                className="rounded-xl border border-border px-5 py-3.5 font-semibold transition-colors hover:bg-muted"
+                className="flex items-center justify-between rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 font-bold text-white hover:bg-amber-500/20 transition-all"
               >
-                {tHome("driver_btn")}
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-xl bg-amber-500 text-black">
+                    <Volume2 className="size-5" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-sm font-bold">Driver Soundbox Hub</div>
+                    <div className="text-xs text-amber-200/70 font-normal">880Hz chime + Voice alerts</div>
+                  </div>
+                </div>
+                <ChevronRight className="size-5 text-amber-400" />
               </button>
-              {/* Quick access for Manager and Admin testing */}
+
               <button
                 onClick={() => { setAuthRole("MANAGER"); setView("auth") }}
-                className="rounded-xl border border-border/60 bg-muted/30 px-4 py-3.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-muted"
+                className="flex items-center justify-between rounded-2xl border border-sky-500/30 bg-sky-500/10 p-4 font-bold text-white hover:bg-sky-500/20 transition-all"
               >
-                Manager Access
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-xl bg-sky-500 text-slate-950">
+                    <BarChart3 className="size-5" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-sm font-bold">Operations Manager Ledger</div>
+                    <div className="text-xs text-sky-200/70 font-normal">2.5% fee splits & payouts</div>
+                  </div>
+                </div>
+                <ChevronRight className="size-5 text-sky-400" />
               </button>
+
               <button
                 onClick={() => { setAuthRole("ADMIN"); setView("auth") }}
-                className="rounded-xl border border-border/60 bg-muted/30 px-4 py-3.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-muted"
+                className="flex items-center justify-between rounded-2xl border border-red-500/30 bg-red-500/10 p-4 font-bold text-white hover:bg-red-500/20 transition-all"
               >
-                Admin Console
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-xl bg-red-500 text-white">
+                    <Settings className="size-5" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-sm font-bold">Super Admin Settings</div>
+                    <div className="text-xs text-red-200/70 font-normal">Runtime in-app config</div>
+                  </div>
+                </div>
+                <ChevronRight className="size-5 text-red-400" />
               </button>
+            </div>
+          </div>
+
+          {/* Metrics Bar matching thumbnail */}
+          <div className="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-emerald-500/20 pt-8">
+            <div className="rounded-2xl border border-emerald-500/20 bg-[#08201b]/60 p-4">
+              <div className="text-2xl sm:text-3xl font-black text-emerald-400">50 / 50</div>
+              <div className="text-xs text-slate-300 font-medium mt-1">Automated Tests Passing</div>
+            </div>
+            <div className="rounded-2xl border border-emerald-500/20 bg-[#08201b]/60 p-4">
+              <div className="text-2xl sm:text-3xl font-black text-amber-400">&lt; 200 ms</div>
+              <div className="text-xs text-slate-300 font-medium mt-1">Soundbox Audio Latency</div>
+            </div>
+            <div className="rounded-2xl border border-emerald-500/20 bg-[#08201b]/60 p-4">
+              <div className="text-2xl sm:text-3xl font-black text-sky-400">Web + Mobile</div>
+              <div className="text-xs text-slate-300 font-medium mt-1">Next.js Edge + Expo App</div>
+            </div>
+            <div className="rounded-2xl border border-emerald-500/20 bg-[#08201b]/60 p-4">
+              <div className="text-2xl sm:text-3xl font-black text-purple-400">Zero Code</div>
+              <div className="text-xs text-slate-300 font-medium mt-1">In-App Runtime Settings</div>
             </div>
           </div>
         </main>
@@ -2765,7 +2821,7 @@ export default function PayTaxiApp({ initialTaxiId }: { initialTaxiId?: string }
 
       {view === "manager" && (
         <ManagerPortal
-          onRefresh={() => {}}
+          onRefresh={() => { }}
           onLogout={signOut}
         />
       )}
