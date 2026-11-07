@@ -689,10 +689,19 @@ function PassengerPay({
 // ---------- Multi-Method Auth (Phone OTP, Driver PIN Fallback, QR Session) ----------
 function OtpAuth({ role, onSuccess, onBack }: { role: UserRole; onSuccess: (user: User) => void; onBack: () => void }) {
   const t = useTranslations("auth")
+  const defaultPhone =
+    role === "DRIVER"
+      ? "+251922222222"
+      : role === "MANAGER"
+      ? "+251944444444"
+      : role === "ADMIN"
+      ? "+251911111111"
+      : "+251933333333"
+
   const [authMode, setAuthMode] = useState<"otp" | "pin" | "qr">("otp")
-  const [phone, setPhone] = useState("")
+  const [phone, setPhone] = useState(defaultPhone)
   const [code, setCode] = useState("")
-  const [pin, setPin] = useState("")
+  const [pin, setPin] = useState(role === "DRIVER" ? "ABCD1234" : "")
   const [challengeId, setChallengeId] = useState<string | null>(null)
   const [devCode, setDevCode] = useState<string | null>(null)
   const [error, setError] = useState("")

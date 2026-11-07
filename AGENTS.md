@@ -10,7 +10,7 @@
 
 ## Portfolio Suite & Presentation Assets
 - **Location**: `docs/portfolio/`
-- **Visual Identity Parity**: Web frontend (`frontend/`) and portfolio assets now strictly share the exact same dark emerald (`#061412` / `#00473e`) FinTech theme, authentic Ethiopian license plates (`AA 3-B12345`), gold accents (`#f59e0b`), and `Plus Jakarta Sans` typography.
+- **Visual Identity Parity**: Web frontend (`frontend/`) and portfolio assets now strictly share the exact same dark emerald (`#061412` / `#00473e`) FinTech theme, authentic Ethiopian license plates (`AA 3-B12345`), gold accents (`#f59e0b`), and bilingual `Plus Jakarta Sans` + `Noto Sans Ethiopic` typography.
 - **Cross-Platform Dual Showcase (Desktop Laptop + Phone Side-by-Side 1920x1080 @2x)**: `docs/portfolio/showcase_desktop_and_mobile.png`
 - **Portfolio Thumbnail / Hero Banner (1920x1080 @2x)**: `docs/portfolio/portfolio_thumbnail.png`
 - **Combined All-in-One Product Showcase**: `docs/portfolio/portfolio_combined_showcase.png`
