@@ -295,8 +295,8 @@ function generatePortfolioHtml() {
           <span style="font-size: 15px; font-weight: 600; color: #475569;">Total Amount Due:</span>
           <span style="font-size: 24px; font-weight: 800; color: #00473e;">50.00 ETB</span>
         </div>
-        <button class="btn-pay">Pay 50.00 ETB with AddisPay</button>
-        <div style="text-align: center; margin-top: 14px; font-size: 12px; color: #94a3b8;">🔒 Secured via AddisPay Ethiopia (Telebirr & CBE)</div>
+        <button class="btn-pay">Pay 50.00 ETB with Telebirr / AddisPay</button>
+        <div style="text-align: center; margin-top: 14px; font-size: 12px; color: #94a3b8;">🔒 Multi-Rail: Telebirr &bull; AddisPay &bull; Chapa &bull; CBE Birr</div>
       </div>
     </div>
 
