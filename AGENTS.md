@@ -85,15 +85,17 @@
 
 ### Payments
 - Initiate payment (server validates fare/taxi/driver): `backend/src/routes/payments.ts` → `POST /payments/initiate` (rate limited: 30/15min)
+- **Supported Payment Gateways API**: `backend/src/routes/payments.ts` → `GET /payments/gateways` (retrieves active gateway and dynamic providers: Telebirr, AddisPay, Chapa, CBE Birr, Sandbox)
+- **Multi-Rail Ethiopian Payment Engine**: `backend/src/services/provider.ts` (`TelebirrProvider`, `AddisPayProvider`, `ChapaProvider`, `CbeBirrProvider`, `SandboxPaymentProvider`)
+- **Passenger Checkout Rail Selector**: Web passenger checkout presents digital wallet selector (Telebirr, AddisPay, Chapa, CBE Birr, Simulator)
 - **Guest passenger checkout**: `optionalAuth` middleware allows passengers to pay without forced login (`passengerUserId` is optional in DB)
 - **Minibus transit fare presets**: `backend/src/services/fares.ts` (10, 15, 20, 25, 35, 50 ETB) + multi-seat count multiplier + custom fares (5–500 ETB)
 - **Public transaction status / receipt**: `backend/src/routes/payments.ts` → `GET /payments/:id`
 - **Sandbox test simulation**: `backend/src/routes/payments.ts` → `POST /payments/:id/simulate-success`
 - **Weyala anti-fraud receipt**: Dynamic animated green receipt on web and mobile with live ticking timer, Ethiopian plate number badge, and anti-screenshot security code
-- Payment provider interface + sandbox: `backend/src/services/provider.ts` (AddisPaySandboxProvider)
 
 ### Webhooks
-- AddisPay callback: `backend/src/routes/webhooks.ts` → `POST /webhooks/addispay`
+- Multi-provider webhooks: `POST /webhooks/addispay`, `POST /webhooks/telebirr`, `POST /webhooks/chapa`, `POST /webhooks/cbe`
 - Idempotency: unique constraint on `(provider, providerEventId)` in DB
 - Compare-and-set: `updateMany` with status precondition; if `count === 0`, re-reads actual status — idempotent if matches, logs `webhook_race_conflict` warning if not
 - State machine (legal transitions): `backend/src/services/fares.ts#canTransition`
@@ -172,7 +174,8 @@ Migration `20260808085150_add_check_constraints` adds:
 - `webhooks.test.ts` — idempotency, compare-and-set race, terminal state protection (9 cases)
 - `auth.service.test.ts` — OTP generation, hashing, attempt limits, expiration, and role validation
 - `drivers.service.test.ts` — registration, approval, and QR replacement flows
-- **Total: 50 tests, 4 suites, all passing**
+- `provider.test.ts` — multi-gateway resolution, Telebirr H5 orders, Chapa integration, CBE Birr USSD, and signature checks (7 cases)
+- **Total: 57 tests, 5 suites, all passing**
 
 - **Jest dependency pin**: root `package.json` → `pnpm.overrides` forces `jest-environment-node` to `30.4.1`. Without it, pnpm resolves `jest-runtime@30.4.2`'s `jest-environment-node` to `29.7.0` whose `jest-mock@29.7.0` moduleMocker lacks `clearMocksOnScope` → `TypeError` on suite start. Do not remove the override.
 

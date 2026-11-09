@@ -75,6 +75,7 @@ type ReceiptData = {
   taxiId: string
   seats: number
   label: string
+  provider?: string
   driver: {
     displayName: string
     plateNumber: string
@@ -346,8 +347,15 @@ function WeyalaReceipt({
           )}
 
           <div className="flex items-center justify-between border-b border-white/10 pb-3 text-xs">
-            <span className="text-slate-300">AddisPay Reference</span>
-            <span className="font-mono font-semibold text-emerald-400">TXN-AP-{receipt.id.slice(0, 8).toUpperCase()}</span>
+            <span className="text-slate-300">Payment Gateway</span>
+            <span className="font-mono font-semibold text-emerald-400">
+              {receipt.provider ? `${receipt.provider} Verified` : "Telebirr / AddisPay Verified"}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between border-b border-white/10 pb-3 text-xs">
+            <span className="text-slate-300">Transaction Reference</span>
+            <span className="font-mono font-semibold text-emerald-400">TXN-PT-{receipt.id.slice(0, 8).toUpperCase()}</span>
           </div>
 
           <div className="pt-2 text-center">
@@ -405,6 +413,8 @@ function PassengerPay({
   const [customAmount, setCustomAmount] = useState<string>("15")
   const [passengerCount, setPassengerCount] = useState<number>(1)
   const [passengerPhone, setPassengerPhone] = useState<string>("")
+  const [paymentGateway, setPaymentGateway] = useState<string>("TELEBIRR")
+  const [paymentInstructions, setPaymentInstructions] = useState<string>("")
   const [state, setState] = useState<"idle" | "pending" | "simulating" | "error">("idle")
   const [message, setMessage] = useState("")
 
@@ -416,6 +426,17 @@ function PassengerPay({
       .catch(() => setTaxiDetails(null))
   }, [taxiId])
 
+  // Fetch admin-configured active gateway
+  useEffect(() => {
+    apiFetch("/payments/gateways")
+      .then((data: { activeGateway?: string }) => {
+        if (data.activeGateway && data.activeGateway !== "MULTI_CHOICE") {
+          setPaymentGateway(data.activeGateway)
+        }
+      })
+      .catch(() => {})
+  }, [])
+
   // Calculate live total
   const selectedPreset = FARE_PRESETS.find((p) => p.id === farePresetId) || FARE_PRESETS[1]
   const unitAmount = fareMode === "preset" ? selectedPreset.amount : (Number(customAmount) || 0)
@@ -424,6 +445,7 @@ function PassengerPay({
   const handlePay = async (simulate: boolean = false) => {
     try {
       setMessage("")
+      setPaymentInstructions("")
       setState(simulate ? "simulating" : "pending")
 
       const payload = {
@@ -432,11 +454,12 @@ function PassengerPay({
         customAmount: fareMode === "custom" ? Number(customAmount) : undefined,
         passengerCount,
         passengerPhone: passengerPhone.trim() || undefined,
+        paymentMethod: simulate ? "SANDBOX" : paymentGateway,
       }
 
       const initData = await postJson("/payments/initiate", payload)
 
-      if (simulate) {
+      if (simulate || paymentGateway === "SANDBOX") {
         // Direct sandbox instant simulation for testing & immediate receipt rendering
         const simResult = await postJson(`/payments/${initData.transactionId}/simulate-success`)
         onReceipt({
@@ -449,13 +472,17 @@ function PassengerPay({
           taxiId: simResult.transaction.taxiId,
           seats: passengerCount,
           label: initData.fare.label,
+          provider: initData.provider || paymentGateway,
           driver: simResult.transaction.driver,
         })
       } else {
-        if (initData.checkoutUrl && initData.checkoutUrl.startsWith("http")) {
+        if (initData.instructions) {
+          setPaymentInstructions(initData.instructions)
+        }
+        if (initData.checkoutUrl && initData.checkoutUrl.startsWith("http") && !initData.checkoutUrl.includes("payment=pending")) {
           window.location.href = initData.checkoutUrl
         } else {
-          setMessage(`Transaction created: ${initData.transactionId}. Amount: ${totalAmount} ETB.`)
+          setMessage(`Payment order initiated with ${initData.provider || paymentGateway}. Reference: ${initData.providerReference || initData.transactionId}`)
           setState("idle")
         }
       }
@@ -633,6 +660,46 @@ function PassengerPay({
             className="mt-1.5 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm"
           />
         </div>
+
+        {/* Payment Gateway & Method Selector */}
+        <div className="mt-5">
+          <div className="flex items-center justify-between">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Payment Method & Digital Wallet
+            </label>
+            <span className="text-[11px] font-medium text-emerald-400">Ethiopian Digital Rails</span>
+          </div>
+
+          <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {[
+              { id: "TELEBIRR", name: "Telebirr", badge: "SuperApp / *127#", color: "border-emerald-500 bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500" },
+              { id: "ADDISPAY", name: "AddisPay", badge: "Bank & Cards", color: "border-amber-500 bg-amber-500/10 text-amber-300 ring-1 ring-amber-500" },
+              { id: "CHAPA", name: "Chapa", badge: "Telebirr + CBE + Cards", color: "border-teal-400 bg-teal-500/10 text-teal-300 ring-1 ring-teal-400" },
+              { id: "CBE_BIRR", name: "CBE Birr", badge: "Commercial Bank *847#", color: "border-purple-500 bg-purple-500/10 text-purple-300 ring-1 ring-purple-500" },
+              { id: "SANDBOX", name: "1-Click Test", badge: "Instant Simulator", color: "border-blue-500 bg-blue-500/10 text-blue-300 ring-1 ring-blue-500" },
+            ].map((gw) => (
+              <button
+                key={gw.id}
+                type="button"
+                onClick={() => setPaymentGateway(gw.id)}
+                className={`flex flex-col items-start rounded-xl border p-2.5 text-left transition-all ${
+                  paymentGateway === gw.id
+                    ? `${gw.color} shadow-sm`
+                    : "border-border bg-card/60 text-muted-foreground hover:border-emerald-500/40 hover:text-foreground"
+                }`}
+              >
+                <span className="text-xs font-bold text-foreground">{gw.name}</span>
+                <span className="text-[10px] opacity-75">{gw.badge}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {paymentInstructions && (
+          <div className="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-300">
+            ℹ️ {paymentInstructions}
+          </div>
+        )}
 
         {/* Total Summary Box */}
         <div className="mt-6 flex items-center justify-between rounded-2xl bg-primary/10 px-5 py-4">
@@ -2237,24 +2304,132 @@ function AdminPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout:
       {/* TAB 3: System Settings & APIs (The Requested Feature: Live In-App Configuration!) */}
       {adminTab === "settings" && (
         <form onSubmit={handleSaveSettings} className="mt-6 space-y-6">
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          {/* Active Payment Gateway Selector */}
+          <div className="rounded-2xl border border-emerald-500/30 bg-card p-6 shadow-sm">
             <div className="flex items-center gap-2 border-b border-border pb-3">
               <CreditCard className="size-5 text-primary" />
               <div>
-                <h3 className="font-bold text-base">Payment Gateway Integration (AddisPay)</h3>
-                <p className="text-xs text-muted-foreground">Configure payment endpoint, merchant credentials, and sandbox simulation.</p>
+                <h3 className="font-bold text-base">Primary Payment Rail & Passenger Checkout Mode</h3>
+                <p className="text-xs text-muted-foreground">Choose whether passengers pick their own wallet (Telebirr, AddisPay, Chapa) or enforce a primary gateway.</p>
+              </div>
+            </div>
+
+            <div className="mt-4 text-xs">
+              <label className="block font-semibold">Active Payment Gateway Strategy</label>
+              <select
+                value={settingValues["payment_active_gateway"] || "MULTI_CHOICE"}
+                onChange={(e) => setSettingValues((p) => ({ ...p, payment_active_gateway: e.target.value }))}
+                className="mt-1.5 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <option value="MULTI_CHOICE">MULTI_CHOICE (Recommended: Passenger picks Telebirr, AddisPay, Chapa, or CBE Birr)</option>
+                <option value="TELEBIRR">TELEBIRR (Ethio Telecom SuperApp & *127# USSD Payment)</option>
+                <option value="ADDISPAY">ADDISPAY (AddisPay Payment Gateway & Bank Card Aggregator)</option>
+                <option value="CHAPA">CHAPA (Chapa Unified Ethiopian Fintech Gateway)</option>
+                <option value="CBE_BIRR">CBE_BIRR (Commercial Bank of Ethiopia *847# Mobile Money)</option>
+                <option value="SANDBOX">SANDBOX (Direct 1-Click Instant Test Simulator)</option>
+              </select>
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                When set to MULTI_CHOICE, passengers will see brand tiles for Telebirr, AddisPay, Chapa, CBE Birr, and Sandbox directly on the vehicle checkout screen.
+              </p>
+            </div>
+          </div>
+
+          {/* Ethio Telecom Telebirr Integration */}
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-center gap-2 border-b border-border pb-3">
+              <span className="flex size-6 items-center justify-center rounded-lg bg-emerald-500/20 text-xs font-bold text-emerald-400">TLB</span>
+              <div>
+                <h3 className="font-bold text-base">Ethio Telecom Telebirr H5 & SuperApp</h3>
+                <p className="text-xs text-muted-foreground">Official Ethio Telecom developer credentials (developer.ethiotelecom.et).</p>
               </div>
             </div>
 
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 text-xs">
               <div className="sm:col-span-2 flex items-center justify-between rounded-xl bg-muted/50 p-3">
                 <div>
-                  <p className="font-bold text-foreground">Sandbox Simulation Mode</p>
+                  <p className="font-bold text-foreground">Telebirr Sandbox Simulation</p>
+                  <p className="text-[11px] text-muted-foreground">Test Telebirr checkout without live Ethio Telecom account balances.</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settingValues["telebirr_sandbox_mode"] !== "false"}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, telebirr_sandbox_mode: e.target.checked ? "true" : "false" }))}
+                  className="size-5 rounded border-border text-primary focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">Fabric App ID</label>
+                <input
+                  value={settingValues["telebirr_app_id"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, telebirr_app_id: e.target.value }))}
+                  placeholder="e.g. 100123456789"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">Fabric App Key / Secret</label>
+                <input
+                  value={settingValues["telebirr_app_key"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, telebirr_app_key: e.target.value }))}
+                  placeholder="App secret from Ethio Telecom"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">Telebirr Short Code (Till / Paybill)</label>
+                <input
+                  value={settingValues["telebirr_short_code"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, telebirr_short_code: e.target.value }))}
+                  placeholder="100123"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">Telebirr Base H5 URL</label>
+                <input
+                  value={settingValues["telebirr_base_url"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, telebirr_base_url: e.target.value }))}
+                  placeholder="https://app.ethiomobilemoney.et:2121/ammapi/payment/service-open/"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="block font-semibold">Telebirr RSA Public Key</label>
+                <textarea
+                  rows={2}
+                  value={settingValues["telebirr_public_key"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, telebirr_public_key: e.target.value }))}
+                  placeholder="MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA..."
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* AddisPay Gateway */}
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-center gap-2 border-b border-border pb-3">
+              <span className="flex size-6 items-center justify-center rounded-lg bg-amber-500/20 text-xs font-bold text-amber-400">AP</span>
+              <div>
+                <h3 className="font-bold text-base">AddisPay Bank & Card Aggregator</h3>
+                <p className="text-xs text-muted-foreground">Configure AddisPay merchant credentials, endpoint, and signature secrets.</p>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 text-xs">
+              <div className="sm:col-span-2 flex items-center justify-between rounded-xl bg-muted/50 p-3">
+                <div>
+                  <p className="font-bold text-foreground">AddisPay Sandbox Mode</p>
                   <p className="text-[11px] text-muted-foreground">Allow instant 1-click payment simulation without real birr deduction.</p>
                 </div>
                 <input
                   type="checkbox"
-                  checked={settingValues["addispay_sandbox_mode"] === "true"}
+                  checked={settingValues["addispay_sandbox_mode"] !== "false"}
                   onChange={(e) => setSettingValues((p) => ({ ...p, addispay_sandbox_mode: e.target.checked ? "true" : "false" }))}
                   className="size-5 rounded border-border text-primary focus:ring-primary"
                 />
@@ -2265,6 +2440,7 @@ function AdminPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout:
                 <input
                   value={settingValues["addispay_api_key"] || ""}
                   onChange={(e) => setSettingValues((p) => ({ ...p, addispay_api_key: e.target.value }))}
+                  placeholder="ap_live_xxxxxxxx..."
                   className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
@@ -2285,6 +2461,95 @@ function AdminPortal({ onRefresh, onLogout }: { onRefresh: () => void; onLogout:
                   value={settingValues["addispay_webhook_secret"] || ""}
                   onChange={(e) => setSettingValues((p) => ({ ...p, addispay_webhook_secret: e.target.value }))}
                   placeholder="sandbox-signature"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Chapa Gateway */}
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-center gap-2 border-b border-border pb-3">
+              <span className="flex size-6 items-center justify-center rounded-lg bg-teal-500/20 text-xs font-bold text-teal-400">CHP</span>
+              <div>
+                <h3 className="font-bold text-base">Chapa Unified Payment Gateway</h3>
+                <p className="text-xs text-muted-foreground">Direct integration with Chapa API (chapa.co) for Telebirr, CBE Birr, Awash, and Bank cards.</p>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 text-xs">
+              <div className="sm:col-span-2 flex items-center justify-between rounded-xl bg-muted/50 p-3">
+                <div>
+                  <p className="font-bold text-foreground">Chapa Sandbox Mode</p>
+                  <p className="text-[11px] text-muted-foreground">Use Chapa test keys without live debits.</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settingValues["chapa_sandbox_mode"] !== "false"}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, chapa_sandbox_mode: e.target.checked ? "true" : "false" }))}
+                  className="size-5 rounded border-border text-primary focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">Chapa Secret Key</label>
+                <input
+                  value={settingValues["chapa_secret_key"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, chapa_secret_key: e.target.value }))}
+                  placeholder="CHASECK_TEST-xxxxxxxx or CHASECK_LIVE-..."
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">Chapa Public Key</label>
+                <input
+                  value={settingValues["chapa_public_key"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, chapa_public_key: e.target.value }))}
+                  placeholder="CHAPUBK_TEST-xxxxxxxx"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="block font-semibold">Chapa Webhook Secret Key</label>
+                <input
+                  value={settingValues["chapa_webhook_secret"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, chapa_webhook_secret: e.target.value }))}
+                  placeholder="sandbox-signature"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* CBE Birr Integration */}
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="flex items-center gap-2 border-b border-border pb-3">
+              <span className="flex size-6 items-center justify-center rounded-lg bg-purple-500/20 text-xs font-bold text-purple-400">CBE</span>
+              <div>
+                <h3 className="font-bold text-base">Commercial Bank of Ethiopia (CBE Birr)</h3>
+                <p className="text-xs text-muted-foreground">Configure CBE Birr till code, merchant credentials, and USSD payments.</p>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 text-xs">
+              <div>
+                <label className="block font-semibold">CBE Birr Merchant Code (*847# Till)</label>
+                <input
+                  value={settingValues["cbe_birr_merchant_id"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, cbe_birr_merchant_id: e.target.value }))}
+                  placeholder="998877"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">CBE Birr API Key (Optional)</label>
+                <input
+                  value={settingValues["cbe_birr_api_key"] || ""}
+                  onChange={(e) => setSettingValues((p) => ({ ...p, cbe_birr_api_key: e.target.value }))}
+                  placeholder="cbe_live_key_..."
                   className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>

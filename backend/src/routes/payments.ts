@@ -2,7 +2,8 @@ import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import { optionalAuth, AuthenticatedRequest } from '../middlewares/auth.middleware';
 import { resolveFare, canTransition } from '../services/fares';
-import { paymentProvider } from '../services/provider';
+import { paymentProvider, getPaymentProvider } from '../services/provider';
+import { getSettingValue } from '../services/settings.service';
 import { prisma } from '../db/prisma';
 
 import { broadcastPaymentSuccess } from '../services/events.service';
@@ -16,11 +17,69 @@ const paymentLimiter = rateLimit({
   message: { error: 'Too many payment requests, please try again later' }
 });
 
+// GET /payments/gateways — returns active gateway setting and list of supported gateways
+router.get('/gateways', async (req, res) => {
+  try {
+    const activeGateway = await getSettingValue('payment_active_gateway', 'MULTI_CHOICE');
+    const addispaySandbox = await getSettingValue('addispay_sandbox_mode', 'true');
+    const telebirrSandbox = await getSettingValue('telebirr_sandbox_mode', 'true');
+    const chapaSandbox = await getSettingValue('chapa_sandbox_mode', 'true');
+
+    res.json({
+      activeGateway,
+      gateways: [
+        {
+          id: 'TELEBIRR',
+          name: 'Telebirr',
+          subtitle: 'Ethio Telecom SuperApp & *127#',
+          badge: 'Most Popular',
+          color: '#00a859',
+          isSandbox: telebirrSandbox === 'true',
+        },
+        {
+          id: 'ADDISPAY',
+          name: 'AddisPay',
+          subtitle: 'Bank & Card Aggregator',
+          badge: 'Bank Transfer',
+          color: '#f59e0b',
+          isSandbox: addispaySandbox === 'true',
+        },
+        {
+          id: 'CHAPA',
+          name: 'Chapa',
+          subtitle: 'Telebirr, CBE Birr & Cards',
+          badge: 'Instant QR',
+          color: '#00d26a',
+          isSandbox: chapaSandbox === 'true',
+        },
+        {
+          id: 'CBE_BIRR',
+          name: 'CBE Birr',
+          subtitle: 'Commercial Bank of Ethiopia (*847#)',
+          badge: 'CBE Wallet',
+          color: '#7b1fa2',
+          isSandbox: true,
+        },
+        {
+          id: 'SANDBOX',
+          name: '1-Click Simulator',
+          subtitle: 'Instant Demo Testing (0 ETB)',
+          badge: 'Test Mode',
+          color: '#10b981',
+          isSandbox: true,
+        },
+      ],
+    });
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
 // POST /payments/initiate — supports both logged-in passengers and guest passengers (no-login flow)
 router.post('/initiate', paymentLimiter, optionalAuth, async (req: AuthenticatedRequest, res) => {
   try {
     const userId = req.user?.id ?? null;
-    const { taxiId, farePresetId, customAmount, passengerCount, passengerPhone, returnUrl } = req.body;
+    const { taxiId, farePresetId, customAmount, passengerCount, passengerPhone, returnUrl, paymentMethod } = req.body;
 
     if (!taxiId) {
       return res.status(400).json({ error: 'taxiId is required' });
@@ -66,11 +125,13 @@ router.post('/initiate', paymentLimiter, optionalAuth, async (req: Authenticated
       }
     });
 
-    const result = await paymentProvider.initiatePayment({
+    const provider = await getPaymentProvider(paymentMethod);
+    const result = await provider.initiatePayment({
       transactionId: transaction.id,
       amount: fare.amount,
       currency: fare.currency,
       taxiId,
+      passengerPhone,
       returnUrl,
     });
 
